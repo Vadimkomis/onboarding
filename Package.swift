@@ -1,0 +1,24 @@
+// swift-tools-version: 5.9
+
+import PackageDescription
+
+let package = Package(
+    name: "ReusableOnboarding",
+    platforms: [
+        .iOS(.v17),
+        .macOS(.v11)
+    ],
+    products: [
+        .library(
+            name: "ReusableOnboarding",
+            targets: ["ReusableOnboarding"]
+        )
+    ],
+    targets: [
+        .target(name: "ReusableOnboarding"),
+        .testTarget(
+            name: "ReusableOnboardingTests",
+            dependencies: ["ReusableOnboarding"]
+        )
+    ]
+)
