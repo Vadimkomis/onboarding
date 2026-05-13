@@ -1,3 +1,4 @@
+import AVKit
 import SwiftUI
 
 public struct OnboardingFlow: View {
@@ -8,7 +9,7 @@ public struct OnboardingFlow: View {
     private let skipTitle: String
     private let onComplete: () -> Void
 
-    @State private var selectedIndex = 0
+    @State private var state: OnboardingFlowState
 
     public init(
         pages: [OnboardingPage],
@@ -24,6 +25,7 @@ public struct OnboardingFlow: View {
         self.completeTitle = completeTitle
         self.skipTitle = skipTitle
         self.onComplete = onComplete
+        _state = State(initialValue: OnboardingFlowState(pageCount: pages.count))
     }
 
     public var body: some View {
@@ -34,13 +36,7 @@ public struct OnboardingFlow: View {
             VStack(spacing: 20) {
                 progressIndicator
 
-                TabView(selection: $selectedIndex) {
-                    ForEach(Array(pages.enumerated()), id: \.element.id) { index, page in
-                        OnboardingPageView(page: page, theme: theme)
-                            .tag(index)
-                    }
-                }
-                .onboardingPageTabStyle()
+                pageContent
 
                 controls
             }
@@ -49,13 +45,40 @@ public struct OnboardingFlow: View {
         }
     }
 
+    @ViewBuilder
+    private var pageContent: some View {
+        #if os(iOS)
+        TabView(selection: $state.selectedIndex) {
+            ForEach(Array(pages.enumerated()), id: \.element.id) { index, page in
+                OnboardingPageView(
+                    page: page,
+                    theme: theme,
+                    isActive: index == state.selectedIndex
+                )
+                    .tag(index)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        #else
+        if pages.indices.contains(state.selectedIndex) {
+            OnboardingPageView(
+                page: pages[state.selectedIndex],
+                theme: theme,
+                isActive: true
+            )
+        } else {
+            Spacer()
+        }
+        #endif
+    }
+
     private var progressIndicator: some View {
         HStack(spacing: 8) {
             ForEach(pages.indices, id: \.self) { index in
                 Capsule()
-                    .fill(index == selectedIndex ? theme.accentColor : theme.raisedColor)
-                    .frame(width: index == selectedIndex ? 30 : 8, height: 8)
-                    .animation(.easeInOut(duration: 0.2), value: selectedIndex)
+                    .fill(index == state.selectedIndex ? theme.accentColor : theme.raisedColor)
+                    .frame(width: index == state.selectedIndex ? 30 : 8, height: 8)
+                    .animation(.easeInOut(duration: 0.2), value: state.selectedIndex)
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)
@@ -82,35 +105,25 @@ public struct OnboardingFlow: View {
     }
 
     private var isLastPage: Bool {
-        selectedIndex >= pages.count - 1
+        state.isLastPage
     }
 
     private func advance() {
-        guard !isLastPage else {
+        guard !state.isLastPage else {
             onComplete()
             return
         }
 
         withAnimation(.easeInOut(duration: 0.24)) {
-            selectedIndex += 1
+            _ = state.advance()
         }
-    }
-}
-
-private extension View {
-    @ViewBuilder
-    func onboardingPageTabStyle() -> some View {
-        #if os(iOS)
-        tabViewStyle(.page(indexDisplayMode: .never))
-        #else
-        self
-        #endif
     }
 }
 
 private struct OnboardingPageView: View {
     let page: OnboardingPage
     let theme: OnboardingTheme
+    let isActive: Bool
 
     var body: some View {
         VStack(spacing: 28) {
@@ -126,11 +139,11 @@ private struct OnboardingPageView: View {
                     .frame(maxWidth: 300, maxHeight: 300)
 
                 VStack(spacing: 18) {
-                    Image(systemName: page.systemImage)
-                        .font(.system(size: 64, weight: .semibold))
-                        .foregroundColor(theme.accentColor)
-                        .frame(width: 128, height: 128)
-                        .background(Circle().fill(theme.highlightColor))
+                    OnboardingMediaView(
+                        media: page.media,
+                        theme: theme,
+                        isActive: isActive
+                    )
 
                     Text(page.accentLabel.uppercased())
                         .font(.caption.weight(.bold))
@@ -157,6 +170,88 @@ private struct OnboardingPageView: View {
             Spacer(minLength: 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct OnboardingMediaView: View {
+    let media: OnboardingPageMedia
+    let theme: OnboardingTheme
+    let isActive: Bool
+
+    var body: some View {
+        switch media {
+        case let .systemImage(systemImage):
+            Image(systemName: systemImage)
+                .font(.system(size: 64, weight: .semibold))
+                .foregroundColor(theme.accentColor)
+                .frame(width: 128, height: 128)
+                .background(Circle().fill(theme.highlightColor))
+
+        case let .image(name):
+            Image(name)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 260, maxHeight: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(theme.borderColor, lineWidth: 1)
+                )
+
+        case let .video(url):
+            OnboardingAutoplayVideoView(url: url, isActive: isActive)
+                .frame(width: 260, height: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(theme.borderColor, lineWidth: 1)
+                )
+        }
+    }
+}
+
+private struct OnboardingAutoplayVideoView: View {
+    let url: URL
+    let isActive: Bool
+
+    @State private var player: AVPlayer?
+
+    var body: some View {
+        VideoPlayer(player: player)
+            .onAppear(perform: updatePlayback)
+            .onChange(of: isActive) { _ in updatePlayback() }
+            .onDisappear(perform: stop)
+            .onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { notification in
+                guard notification.object as? AVPlayerItem == player?.currentItem else {
+                    return
+                }
+
+                player?.seek(to: .zero)
+                player?.play()
+            }
+    }
+
+    private func updatePlayback() {
+        if isActive {
+            play()
+        } else {
+            stop()
+        }
+    }
+
+    private func play() {
+        if player == nil {
+            let player = AVPlayer(url: url)
+            player.isMuted = true
+            self.player = player
+        }
+
+        player?.play()
+    }
+
+    private func stop() {
+        player?.pause()
+        player = nil
     }
 }
 
