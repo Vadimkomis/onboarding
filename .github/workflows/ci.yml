@@ -24,7 +24,13 @@ jobs:
 
       - name: Select Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.5.app/Contents/Developer
+          XCODE_APP="$(find /Applications -maxdepth 1 -name 'Xcode_26.5*.app' | sort | tail -n 1)"
+          if [ -z "$XCODE_APP" ]; then
+            echo "Xcode 26.5 is not installed on this runner"
+            find /Applications -maxdepth 1 -name 'Xcode*.app' | sort
+            exit 1
+          fi
+          sudo xcode-select -s "$XCODE_APP/Contents/Developer"
 
       - name: Show toolchain
         run: |
