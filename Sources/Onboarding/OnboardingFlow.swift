@@ -1,5 +1,6 @@
 import AVKit
 import SwiftUI
+import UIKit
 
 public struct OnboardingFlow: View {
     private let pages: [OnboardingPage]
@@ -182,14 +183,31 @@ private struct OnboardingMediaView: View {
         case let .image(name):
             Image(name)
                 .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 300)
+                .scaledToFill()
+                .frame(
+                    width: OnboardingMediaLayout.portraitWidth,
+                    height: OnboardingMediaLayout.portraitHeight
+                )
+                .clipped()
 
         case let .video(url):
             OnboardingAutoplayVideoView(url: url, isActive: isActive)
-                .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                .frame(maxWidth: 300)
+                .frame(
+                    width: OnboardingMediaLayout.portraitWidth,
+                    height: OnboardingMediaLayout.portraitHeight
+                )
+                .clipped()
         }
+    }
+}
+
+private enum OnboardingMediaLayout {
+    static var portraitWidth: CGFloat {
+        min(320, max(248, UIScreen.main.bounds.width - 72))
+    }
+
+    static var portraitHeight: CGFloat {
+        min(540, max(360, UIScreen.main.bounds.height * 0.56))
     }
 }
 
@@ -200,7 +218,7 @@ private struct OnboardingAutoplayVideoView: View {
     @State private var player: AVPlayer?
 
     var body: some View {
-        VideoPlayer(player: player)
+        OnboardingAspectFillVideoPlayer(player: player)
             .onAppear(perform: updatePlayback)
             .onChange(of: isActive) { updatePlayback() }
             .onDisappear(perform: stop)
@@ -235,6 +253,46 @@ private struct OnboardingAutoplayVideoView: View {
     private func stop() {
         player?.pause()
         player = nil
+    }
+}
+
+private struct OnboardingAspectFillVideoPlayer: UIViewRepresentable {
+    let player: AVPlayer?
+
+    func makeUIView(context: Context) -> OnboardingPlayerView {
+        let view = OnboardingPlayerView()
+        view.videoGravity = .resizeAspectFill
+        view.player = player
+        return view
+    }
+
+    func updateUIView(_ uiView: OnboardingPlayerView, context: Context) {
+        uiView.videoGravity = .resizeAspectFill
+        uiView.player = player
+    }
+}
+
+private final class OnboardingPlayerView: UIView {
+    override static var layerClass: AnyClass {
+        AVPlayerLayer.self
+    }
+
+    var playerLayer: AVPlayerLayer {
+        guard let playerLayer = layer as? AVPlayerLayer else {
+            preconditionFailure("OnboardingPlayerView must be backed by AVPlayerLayer")
+        }
+
+        return playerLayer
+    }
+
+    var player: AVPlayer? {
+        get { playerLayer.player }
+        set { playerLayer.player = newValue }
+    }
+
+    var videoGravity: AVLayerVideoGravity {
+        get { playerLayer.videoGravity }
+        set { playerLayer.videoGravity = newValue }
     }
 }
 

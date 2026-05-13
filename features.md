@@ -35,5 +35,6 @@ Feature: Onboarding page composition
   Scenario: Show page media without an extra container
     Given an onboarding page uses image or video media
     When the page is displayed
-    Then the media is shown directly without a placeholder card around it
+    Then the media is shown directly in a tall portrait viewport without a placeholder card around it
+    And image and video media fill the viewport without side letterboxing
     And the status is "completed"

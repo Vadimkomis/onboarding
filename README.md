@@ -105,7 +105,7 @@ Use `.image(name:)` for images in the host app's asset catalog. The name should 
 
 Use `.video(url:)` for a local or remote video URL. Videos play muted, start when their page becomes active, stop when leaving the page, and loop after reaching the end.
 
-Images and videos render directly, without an extra card or placeholder frame around them.
+Images and videos render directly in a tall portrait viewport, without an extra card or placeholder frame around them. Media fills the viewport so portrait assets use the available height and videos do not show side letterboxing.
 
 For bundled videos, add the file to your app target and create the URL with:
 

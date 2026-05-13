@@ -35,5 +35,5 @@
 
 - Name: Media renders without placeholder card
 - Status: passing
-- Description: Validates the visual onboarding page layout where media is displayed directly instead of inside an additional container.
+- Description: Validates the visual onboarding page layout where media is displayed directly in a tall portrait viewport instead of inside an additional container.
 - Notes: Covered by `OnboardingSnapshotTests.testOnboardingFlowInitialScreen` and `testOnboardingFlowSinglePageCompleteState`.
