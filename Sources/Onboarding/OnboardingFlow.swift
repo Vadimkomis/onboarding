@@ -156,14 +156,18 @@ private struct OnboardingPageView: View {
                         .font(.largeTitle.weight(.bold))
                         .foregroundColor(theme.primaryTextColor)
                         .multilineTextAlignment(.center)
+                        .lineLimit(nil)
                         .minimumScaleFactor(0.82)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Text(page.subtitle)
                         .font(.body)
                         .foregroundColor(theme.secondaryTextColor)
                         .multilineTextAlignment(.center)
+                        .lineLimit(nil)
                         .lineSpacing(3)
-                        .frame(maxWidth: 330)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
                 }
                 .layoutPriority(1)
 
@@ -206,7 +210,7 @@ private struct OnboardingMediaView: View {
 private enum OnboardingMediaLayout {
     static func size(for availableSize: CGSize) -> CGSize {
         let width = min(320, max(248, availableSize.width - 32))
-        let reservedTextHeight: CGFloat = 250
+        let reservedTextHeight: CGFloat = 300
         let height = min(540, max(220, availableSize.height - reservedTextHeight))
 
         return CGSize(width: width, height: height)

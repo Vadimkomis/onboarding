@@ -37,4 +37,5 @@ Feature: Onboarding page composition
     When the page is displayed
     Then the media is shown directly in a tall portrait viewport without a placeholder card around it
     And image and video media fill the viewport without side letterboxing
+    And the title and subtitle wrap without being clipped
     And the status is "completed"
