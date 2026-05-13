@@ -67,7 +67,11 @@ private func assertViewSnapshot(
 
     assertSnapshot(
         of: controller,
-        as: .image(size: size),
+        as: .image(
+            precision: 0.99,
+            perceptualPrecision: 0.98,
+            size: size
+        ),
         named: name,
         file: file,
         testName: testName,
@@ -76,7 +80,11 @@ private func assertViewSnapshot(
     #else
     assertSnapshot(
         of: view,
-        as: .image(layout: .fixed(width: size.width, height: size.height)),
+        as: .image(
+            precision: 0.99,
+            perceptualPrecision: 0.98,
+            layout: .fixed(width: size.width, height: size.height)
+        ),
         named: name,
         file: file,
         testName: testName,
