@@ -7,6 +7,7 @@ public struct OnboardingFlow: View {
     private let continueTitle: String
     private let completeTitle: String
     private let skipTitle: String
+    private let allowsSkipping: Bool
     private let onComplete: () -> Void
 
     @State private var state: OnboardingFlowState
@@ -17,6 +18,7 @@ public struct OnboardingFlow: View {
         continueTitle: String = "Continue",
         completeTitle: String = "Get Started",
         skipTitle: String = "Skip",
+        allowsSkipping: Bool = true,
         onComplete: @escaping () -> Void
     ) {
         self.pages = pages
@@ -24,6 +26,7 @@ public struct OnboardingFlow: View {
         self.continueTitle = continueTitle
         self.completeTitle = completeTitle
         self.skipTitle = skipTitle
+        self.allowsSkipping = allowsSkipping
         self.onComplete = onComplete
         _state = State(initialValue: OnboardingFlowState(pageCount: pages.count))
     }
@@ -92,15 +95,17 @@ public struct OnboardingFlow: View {
             }
             .buttonStyle(OnboardingPrimaryButtonStyle(theme: theme))
 
-            Button(action: onComplete) {
-                Text(skipTitle)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(theme.secondaryTextColor)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+            if allowsSkipping {
+                Button(action: onComplete) {
+                    Text(skipTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(theme.secondaryTextColor)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                }
+                .opacity(isLastPage ? 0 : 1)
+                .disabled(isLastPage)
             }
-            .opacity(isLastPage ? 0 : 1)
-            .disabled(isLastPage)
         }
     }
 

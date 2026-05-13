@@ -23,6 +23,7 @@ final class OnboardingFlowTests: XCTestCase {
             continueTitle: "Next",
             completeTitle: "Done",
             skipTitle: "Later",
+            allowsSkipping: false,
             onComplete: { didComplete = true }
         )
 
@@ -30,6 +31,7 @@ final class OnboardingFlowTests: XCTestCase {
         XCTAssertEqual(try mirroredValue("continueTitle", in: flow), "Next")
         XCTAssertEqual(try mirroredValue("completeTitle", in: flow), "Done")
         XCTAssertEqual(try mirroredValue("skipTitle", in: flow), "Later")
+        XCTAssertFalse(try mirroredValue("allowsSkipping", in: flow))
 
         let completion: () -> Void = try mirroredValue("onComplete", in: flow)
         completion()
@@ -46,6 +48,7 @@ final class OnboardingFlowTests: XCTestCase {
         XCTAssertEqual(try mirroredValue("continueTitle", in: flow), "Continue")
         XCTAssertEqual(try mirroredValue("completeTitle", in: flow), "Get Started")
         XCTAssertEqual(try mirroredValue("skipTitle", in: flow), "Skip")
+        XCTAssertTrue(try mirroredValue("allowsSkipping", in: flow))
         _ = flow.body
     }
 

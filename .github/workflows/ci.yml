@@ -42,4 +42,4 @@ jobs:
         run: |
           xcodebuild test \
             -scheme Onboarding \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest'

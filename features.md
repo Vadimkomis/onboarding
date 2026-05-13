@@ -15,3 +15,11 @@ Feature: Keep implementation aligned with specs
     When behavior differs from this file
     Then the code is brought into alignment with this spec
     Or the spec is updated with explicit approval
+
+Feature: Onboarding completion controls
+
+  Scenario: Require users to complete every onboarding page
+    Given an app configures onboarding with skipping disabled
+    When the onboarding flow is shown before the final page
+    Then the skip action is not available
+    And the status is "completed"

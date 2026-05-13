@@ -141,13 +141,28 @@ let theme = OnboardingTheme(
 OnboardingGate(
     storageKey: "hasCompletedOnboarding",
     pages: onboardingPages,
-    theme: theme
+    theme: theme,
+    allowsSkipping: false
 ) {
     MainAppView()
 }
 ```
 
 If you do not pass a theme, the package uses `OnboardingTheme.standard`.
+
+## Optional Skip
+
+The skip button is enabled by default. Disable it when users must complete every onboarding page:
+
+```swift
+OnboardingGate(
+    storageKey: "hasCompletedOnboarding",
+    pages: onboardingPages,
+    allowsSkipping: false
+) {
+    MainAppView()
+}
+```
 
 ## Direct Flow Usage
 
@@ -181,6 +196,7 @@ OnboardingGate(
     storageKey: String,
     pages: [OnboardingPage],
     theme: OnboardingTheme = .standard,
+    allowsSkipping: Bool = true,
     @ViewBuilder content: () -> Content
 )
 
@@ -198,6 +214,7 @@ OnboardingFlow(
     continueTitle: String = "Continue",
     completeTitle: String = "Get Started",
     skipTitle: String = "Skip",
+    allowsSkipping: Bool = true,
     onComplete: @escaping () -> Void
 )
 ```

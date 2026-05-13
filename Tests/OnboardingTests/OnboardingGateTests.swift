@@ -18,12 +18,14 @@ final class OnboardingGateTests: XCTestCase {
         let gate = OnboardingGate(
             storageKey: "test.onboarding.completed",
             pages: pages,
-            theme: .standard
+            theme: .standard,
+            allowsSkipping: false
         ) {
             Text("Main content")
         }
 
         XCTAssertEqual(try mirroredValue("pages", in: gate), pages)
+        XCTAssertFalse(try mirroredValue("allowsSkipping", in: gate))
         let content: Text = try mirroredValue("content", in: gate)
         XCTAssertNotNil(content)
         _ = gate.body
