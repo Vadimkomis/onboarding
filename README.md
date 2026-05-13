@@ -87,6 +87,8 @@ struct RootView: View {
 
 `OnboardingGate` stores completion in `AppStorage` using the `storageKey`. Once the user taps skip or completes the final page, the gate shows your main content on future launches.
 
+The number of screens is controlled by the `pages` array. Pass one `OnboardingPage` for a single-screen flow or as many pages as your onboarding needs.
+
 ## Page Media
 
 Each `OnboardingPage` can show one media type:
@@ -102,6 +104,8 @@ Use `.systemImage` for SF Symbols.
 Use `.image(name:)` for images in the host app's asset catalog. The name should match the asset name.
 
 Use `.video(url:)` for a local or remote video URL. Videos play muted, start when their page becomes active, stop when leaving the page, and loop after reaching the end.
+
+Images and videos render directly, without an extra card or placeholder frame around them.
 
 For bundled videos, add the file to your app target and create the URL with:
 

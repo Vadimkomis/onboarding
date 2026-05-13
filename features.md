@@ -23,3 +23,17 @@ Feature: Onboarding completion controls
     When the onboarding flow is shown before the final page
     Then the skip action is not available
     And the status is "completed"
+
+Feature: Onboarding page composition
+
+  Scenario: Configure any number of onboarding screens
+    Given an app passes a pages array to the onboarding flow
+    When the flow is displayed
+    Then each page in the array is available as an onboarding screen
+    And the status is "completed"
+
+  Scenario: Show page media without an extra container
+    Given an onboarding page uses image or video media
+    When the page is displayed
+    Then the media is shown directly without a placeholder card around it
+    And the status is "completed"

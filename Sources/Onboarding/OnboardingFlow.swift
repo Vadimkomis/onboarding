@@ -134,28 +134,17 @@ private struct OnboardingPageView: View {
         VStack(spacing: 28) {
             Spacer(minLength: 12)
 
-            ZStack {
-                RoundedRectangle(cornerRadius: 32, style: .continuous)
-                    .fill(theme.cardColor)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 32, style: .continuous)
-                            .stroke(theme.borderColor, lineWidth: 1)
-                    )
-                    .frame(maxWidth: 300, maxHeight: 300)
+            VStack(spacing: 18) {
+                OnboardingMediaView(
+                    media: page.media,
+                    theme: theme,
+                    isActive: isActive
+                )
 
-                VStack(spacing: 18) {
-                    OnboardingMediaView(
-                        media: page.media,
-                        theme: theme,
-                        isActive: isActive
-                    )
-
-                    Text(page.accentLabel.uppercased())
-                        .font(.caption.weight(.bold))
-                        .foregroundColor(theme.warningColor)
-                }
+                Text(page.accentLabel.uppercased())
+                    .font(.caption.weight(.bold))
+                    .foregroundColor(theme.warningColor)
             }
-            .frame(height: 320)
 
             VStack(spacing: 12) {
                 Text(page.title)
@@ -189,28 +178,17 @@ private struct OnboardingMediaView: View {
             Image(systemName: systemImage)
                 .font(.system(size: 64, weight: .semibold))
                 .foregroundColor(theme.accentColor)
-                .frame(width: 128, height: 128)
-                .background(Circle().fill(theme.highlightColor))
 
         case let .image(name):
             Image(name)
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: 260, maxHeight: 220)
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(theme.borderColor, lineWidth: 1)
-                )
+                .frame(maxWidth: 300)
 
         case let .video(url):
             OnboardingAutoplayVideoView(url: url, isActive: isActive)
-                .frame(width: 260, height: 220)
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(theme.borderColor, lineWidth: 1)
-                )
+                .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                .frame(maxWidth: 300)
         }
     }
 }
@@ -224,7 +202,7 @@ private struct OnboardingAutoplayVideoView: View {
     var body: some View {
         VideoPlayer(player: player)
             .onAppear(perform: updatePlayback)
-            .onChange(of: isActive) { _ in updatePlayback() }
+            .onChange(of: isActive) { updatePlayback() }
             .onDisappear(perform: stop)
             .onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { notification in
                 guard notification.object as? AVPlayerItem == player?.currentItem else {

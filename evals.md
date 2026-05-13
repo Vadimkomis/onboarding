@@ -27,3 +27,13 @@
 - Status: passing
 - Description: Validates that `allowsSkipping` is stored by gate and flow configuration so apps can require full onboarding completion.
 - Notes: Covered by `OnboardingFlowTests.testOnboardingFlowStoresCustomConfiguration` and `OnboardingGateTests.testOnboardingGateStoresConfiguration`.
+
+- Name: Page count follows configuration
+- Status: passing
+- Description: Validates that onboarding flow state is derived from the provided page count instead of assuming a fixed three-screen flow.
+- Notes: Covered by `OnboardingFlowStateTests.testInitialStateStartsAtFirstPage`, `testAdvanceMovesForwardUntilLastPage`, `testEmptyStateIsComplete`, and `OnboardingSnapshotTests.testOnboardingFlowSinglePageCompleteState`.
+
+- Name: Media renders without placeholder card
+- Status: passing
+- Description: Validates the visual onboarding page layout where media is displayed directly instead of inside an additional container.
+- Notes: Covered by `OnboardingSnapshotTests.testOnboardingFlowInitialScreen` and `testOnboardingFlowSinglePageCompleteState`.

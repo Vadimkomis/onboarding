@@ -16,26 +16,23 @@ concurrency:
 jobs:
   test:
     name: Swift Tests
-    runs-on: macos-26
+    runs-on: macos-15
+    timeout-minutes: 10
     env:
-      IOS_RUNTIME_VERSION: "26.5"
-      IOS_DEVICE_TYPE: com.apple.CoreSimulator.SimDeviceType.iPhone-17
-      IOS_SIMULATOR_NAME: CI iPhone 17
+      DERIVED_DATA_PATH: .build/DerivedData
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Select Xcode
-        run: |
-          XCODE_APP="$(find /Applications -maxdepth 1 -name 'Xcode_26.5*.app' | sort | tail -n 1)"
-          if [ -z "$XCODE_APP" ]; then
-            echo "Xcode 26.5 is not installed on this runner"
-            find /Applications -maxdepth 1 -name 'Xcode*.app' | sort
-            exit 1
-          fi
-          sudo xcode-select -s "$XCODE_APP/Contents/Developer"
-          sudo xcodebuild -runFirstLaunch
+      - name: Cache Swift build data
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+          key: ${{ runner.os }}-swift-${{ hashFiles('Package.resolved', 'Package.swift') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-
 
       - name: Show toolchain
         run: |
@@ -44,27 +41,16 @@ jobs:
           swift --version
           xcodebuild -showsdks
 
-      - name: Install iOS simulator platform
-        run: |
-          if ! xcrun simctl list runtimes | grep -q "^iOS ${IOS_RUNTIME_VERSION} "; then
-            sudo xcodebuild -downloadPlatform iOS -buildVersion "${IOS_RUNTIME_VERSION}"
-          fi
-          xcrun simctl list runtimes
-
-      - name: Create iOS simulator
-        run: |
-          RUNTIME_ID="com.apple.CoreSimulator.SimRuntime.iOS-${IOS_RUNTIME_VERSION//./-}"
-          if ! xcrun simctl list runtimes | grep -q "$RUNTIME_ID"; then
-            echo "Missing required iOS simulator runtime: $RUNTIME_ID"
-            exit 1
-          fi
-
-          IOS_SIMULATOR_ID="$(xcrun simctl create "$IOS_SIMULATOR_NAME" "$IOS_DEVICE_TYPE" "$RUNTIME_ID")"
-          echo "IOS_SIMULATOR_ID=$IOS_SIMULATOR_ID" >> "$GITHUB_ENV"
-          xcrun simctl list devices "$RUNTIME_ID"
+      - name: Show destinations
+        run: xcodebuild -showdestinations -scheme Onboarding
 
       - name: Run tests
+        timeout-minutes: 6
         run: |
           xcodebuild test \
+            -quiet \
             -scheme Onboarding \
-            -destination "platform=iOS Simulator,id=${IOS_SIMULATOR_ID}"
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination-timeout 60 \
+            -parallel-testing-enabled NO \
+            -derivedDataPath "$DERIVED_DATA_PATH"
