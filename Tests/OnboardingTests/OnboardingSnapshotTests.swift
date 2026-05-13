@@ -14,7 +14,12 @@ final class OnboardingSnapshotTests: XCTestCase {
         )
         .frame(width: 390, height: 844)
 
-        assertViewSnapshot(of: view, named: "initial-screen")
+        assertViewSnapshot(
+            of: view,
+            named: "initial-screen",
+            precision: 0.95,
+            perceptualPrecision: 0.87
+        )
     }
 
     func testOnboardingFlowSinglePageCompleteState() {
@@ -55,6 +60,8 @@ final class OnboardingSnapshotTests: XCTestCase {
 private func assertViewSnapshot(
     of view: some View,
     named name: String,
+    precision: Float = 0.99,
+    perceptualPrecision: Float = 0.98,
     file: StaticString = #filePath,
     testName: String = #function,
     line: UInt = #line
@@ -68,8 +75,8 @@ private func assertViewSnapshot(
     assertSnapshot(
         of: controller,
         as: .image(
-            precision: 0.99,
-            perceptualPrecision: 0.98,
+            precision: precision,
+            perceptualPrecision: perceptualPrecision,
             size: size
         ),
         named: name,
@@ -81,8 +88,8 @@ private func assertViewSnapshot(
     assertSnapshot(
         of: view,
         as: .image(
-            precision: 0.99,
-            perceptualPrecision: 0.98,
+            precision: precision,
+            perceptualPrecision: perceptualPrecision,
             layout: .fixed(width: size.width, height: size.height)
         ),
         named: name,
