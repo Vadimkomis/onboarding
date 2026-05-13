@@ -5,14 +5,13 @@
 ![License](https://img.shields.io/github/license/Vadimkomis/onboarding)
 ![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift&logoColor=white)
 ![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen)
-![Platforms](https://img.shields.io/badge/platforms-iOS%2017%2B%20%7C%20macOS%2011%2B-lightgrey)
+![Platform](https://img.shields.io/badge/platform-iOS%2017%2B-lightgrey)
 
 A small SwiftUI package for reusable first-run onboarding flows.
 
 ## Requirements
 
 - iOS 17+
-- macOS 11+
 - Swift Package Manager
 
 ## Installation

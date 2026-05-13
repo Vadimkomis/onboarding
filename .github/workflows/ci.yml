@@ -39,4 +39,7 @@ jobs:
           swift --version
 
       - name: Run tests
-        run: swift test
+        run: |
+          xcodebuild test \
+            -scheme Onboarding \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
