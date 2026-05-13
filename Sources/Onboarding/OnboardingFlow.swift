@@ -136,7 +136,7 @@ private struct OnboardingPageView: View {
             let mediaSize = OnboardingMediaLayout.size(for: proxy.size)
 
             VStack(spacing: 28) {
-                Spacer(minLength: 12)
+                Spacer(minLength: 24)
 
                 VStack(spacing: 18) {
                     OnboardingMediaView(
@@ -171,7 +171,7 @@ private struct OnboardingPageView: View {
                 }
                 .layoutPriority(1)
 
-                Spacer(minLength: 12)
+                Spacer(minLength: 8)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
@@ -196,7 +196,7 @@ private struct OnboardingMediaView: View {
             Image(name)
                 .resizable()
                 .scaledToFill()
-                .frame(width: mediaSize.width, height: mediaSize.height)
+                .frame(width: mediaSize.width, height: mediaSize.height, alignment: .top)
                 .clipped()
 
         case let .video(url):
@@ -209,9 +209,11 @@ private struct OnboardingMediaView: View {
 
 private enum OnboardingMediaLayout {
     static func size(for availableSize: CGSize) -> CGSize {
-        let width = min(320, max(248, availableSize.width - 32))
+        let portraitAspectRatio: CGFloat = 0.62
         let reservedTextHeight: CGFloat = 300
         let height = min(540, max(220, availableSize.height - reservedTextHeight))
+        let maxWidth = min(320, availableSize.width - 48)
+        let width = min(maxWidth, max(220, height * portraitAspectRatio))
 
         return CGSize(width: width, height: height)
     }
