@@ -37,6 +37,14 @@ jobs:
           sw_vers
           xcodebuild -version
           swift --version
+          xcodebuild -showsdks
+
+      - name: Install iOS simulator platform
+        run: |
+          if ! xcrun simctl list runtimes | grep -q '^iOS '; then
+            sudo xcodebuild -downloadPlatform iOS
+          fi
+          xcrun simctl list runtimes
 
       - name: Run tests
         run: |
