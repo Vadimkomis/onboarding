@@ -17,6 +17,10 @@ jobs:
   test:
     name: Swift Tests
     runs-on: macos-26
+    env:
+      IOS_RUNTIME_VERSION: "26.5"
+      IOS_DEVICE_TYPE: com.apple.CoreSimulator.SimDeviceType.iPhone-17
+      IOS_SIMULATOR_NAME: CI iPhone 17
 
     steps:
       - name: Check out repository
@@ -31,6 +35,7 @@ jobs:
             exit 1
           fi
           sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          sudo xcodebuild -runFirstLaunch
 
       - name: Show toolchain
         run: |
@@ -41,13 +46,25 @@ jobs:
 
       - name: Install iOS simulator platform
         run: |
-          if ! xcrun simctl list runtimes | grep -q '^iOS '; then
-            sudo xcodebuild -downloadPlatform iOS
+          if ! xcrun simctl list runtimes | grep -q "^iOS ${IOS_RUNTIME_VERSION} "; then
+            sudo xcodebuild -downloadPlatform iOS -buildVersion "${IOS_RUNTIME_VERSION}"
           fi
           xcrun simctl list runtimes
+
+      - name: Create iOS simulator
+        run: |
+          RUNTIME_ID="com.apple.CoreSimulator.SimRuntime.iOS-${IOS_RUNTIME_VERSION//./-}"
+          if ! xcrun simctl list runtimes | grep -q "$RUNTIME_ID"; then
+            echo "Missing required iOS simulator runtime: $RUNTIME_ID"
+            exit 1
+          fi
+
+          IOS_SIMULATOR_ID="$(xcrun simctl create "$IOS_SIMULATOR_NAME" "$IOS_DEVICE_TYPE" "$RUNTIME_ID")"
+          echo "IOS_SIMULATOR_ID=$IOS_SIMULATOR_ID" >> "$GITHUB_ENV"
+          xcrun simctl list devices "$RUNTIME_ID"
 
       - name: Run tests
         run: |
           xcodebuild test \
             -scheme Onboarding \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest'
+            -destination "platform=iOS Simulator,id=${IOS_SIMULATOR_ID}"
