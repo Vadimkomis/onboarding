@@ -3,22 +3,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "ReusableOnboarding",
+    name: "Onboarding",
     platforms: [
         .iOS(.v17),
         .macOS(.v11)
     ],
     products: [
         .library(
-            name: "ReusableOnboarding",
-            targets: ["ReusableOnboarding"]
+            name: "Onboarding",
+            targets: ["Onboarding"]
         )
     ],
     targets: [
-        .target(name: "ReusableOnboarding"),
+        .target(name: "Onboarding"),
         .testTarget(
-            name: "ReusableOnboardingTests",
-            dependencies: ["ReusableOnboarding"]
+            name: "OnboardingTests",
+            dependencies: ["Onboarding"]
         )
     ]
 )

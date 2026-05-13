@@ -1,11 +1,11 @@
-# ReusableOnboarding
+# Onboarding
 
 A small SwiftUI onboarding package for apps that need a reusable first-run flow.
 
 ## Usage
 
 ```swift
-import ReusableOnboarding
+import Onboarding
 
 let pages = [
     OnboardingPage(
