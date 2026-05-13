@@ -132,37 +132,44 @@ private struct OnboardingPageView: View {
     let isActive: Bool
 
     var body: some View {
-        VStack(spacing: 28) {
-            Spacer(minLength: 12)
+        GeometryReader { proxy in
+            let mediaSize = OnboardingMediaLayout.size(for: proxy.size)
 
-            VStack(spacing: 18) {
-                OnboardingMediaView(
-                    media: page.media,
-                    theme: theme,
-                    isActive: isActive
-                )
+            VStack(spacing: 28) {
+                Spacer(minLength: 12)
 
-                Text(page.accentLabel.uppercased())
-                    .font(.caption.weight(.bold))
-                    .foregroundColor(theme.warningColor)
+                VStack(spacing: 18) {
+                    OnboardingMediaView(
+                        media: page.media,
+                        theme: theme,
+                        isActive: isActive,
+                        mediaSize: mediaSize
+                    )
+
+                    Text(page.accentLabel.uppercased())
+                        .font(.caption.weight(.bold))
+                        .foregroundColor(theme.warningColor)
+                }
+
+                VStack(spacing: 12) {
+                    Text(page.title)
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundColor(theme.primaryTextColor)
+                        .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.82)
+
+                    Text(page.subtitle)
+                        .font(.body)
+                        .foregroundColor(theme.secondaryTextColor)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(3)
+                        .frame(maxWidth: 330)
+                }
+                .layoutPriority(1)
+
+                Spacer(minLength: 12)
             }
-
-            VStack(spacing: 12) {
-                Text(page.title)
-                    .font(.largeTitle.weight(.bold))
-                    .foregroundColor(theme.primaryTextColor)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.82)
-
-                Text(page.subtitle)
-                    .font(.body)
-                    .foregroundColor(theme.secondaryTextColor)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(3)
-                    .frame(maxWidth: 330)
-            }
-
-            Spacer(minLength: 12)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -172,6 +179,7 @@ private struct OnboardingMediaView: View {
     let media: OnboardingPageMedia
     let theme: OnboardingTheme
     let isActive: Bool
+    let mediaSize: CGSize
 
     var body: some View {
         switch media {
@@ -184,30 +192,24 @@ private struct OnboardingMediaView: View {
             Image(name)
                 .resizable()
                 .scaledToFill()
-                .frame(
-                    width: OnboardingMediaLayout.portraitWidth,
-                    height: OnboardingMediaLayout.portraitHeight
-                )
+                .frame(width: mediaSize.width, height: mediaSize.height)
                 .clipped()
 
         case let .video(url):
             OnboardingAutoplayVideoView(url: url, isActive: isActive)
-                .frame(
-                    width: OnboardingMediaLayout.portraitWidth,
-                    height: OnboardingMediaLayout.portraitHeight
-                )
+                .frame(width: mediaSize.width, height: mediaSize.height)
                 .clipped()
         }
     }
 }
 
 private enum OnboardingMediaLayout {
-    static var portraitWidth: CGFloat {
-        min(320, max(248, UIScreen.main.bounds.width - 72))
-    }
+    static func size(for availableSize: CGSize) -> CGSize {
+        let width = min(320, max(248, availableSize.width - 32))
+        let reservedTextHeight: CGFloat = 250
+        let height = min(540, max(220, availableSize.height - reservedTextHeight))
 
-    static var portraitHeight: CGFloat {
-        min(540, max(360, UIScreen.main.bounds.height * 0.56))
+        return CGSize(width: width, height: height)
     }
 }
 
