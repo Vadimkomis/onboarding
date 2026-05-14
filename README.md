@@ -1,7 +1,7 @@
 # Onboarding
 
 [![CI](https://github.com/Vadimkomis/onboarding/actions/workflows/ci.yml/badge.svg)](https://github.com/Vadimkomis/onboarding/actions/workflows/ci.yml)
-![GitHub Release](https://img.shields.io/github/v/release/Vadimkomis/onboarding)
+![GitHub Tag](https://img.shields.io/github/v/tag/Vadimkomis/onboarding)
 ![License](https://img.shields.io/github/license/Vadimkomis/onboarding)
 ![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift&logoColor=white)
 ![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen)
