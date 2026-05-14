@@ -25,9 +25,3 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - GitHub Actions CI for iOS tests.
 - MIT license.
 
-### Fixed
-
-- Removed the extra placeholder frame around image and video media.
-- Prevented video side letterboxing in the onboarding media viewport.
-- Prevented tall media from clipping title and subtitle text.
-- Improved snapshot test stability on iOS CI.
