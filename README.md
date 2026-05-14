@@ -244,10 +244,3 @@ OnboardingFlow(
 ## License
 
 Onboarding is available under the MIT license. See [LICENSE](LICENSE) for details.
-
-## Project
-
-- [Changelog](CHANGELOG.md)
-- [Contributing](CONTRIBUTING.md)
-- [Support](SUPPORT.md)
-- [Security](SECURITY.md)
