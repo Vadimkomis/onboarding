@@ -243,6 +243,7 @@ private enum OnboardingMediaLayout {
 private enum OnboardingMediaPreloader {
     private static var decodedImages: [String: UIImage] = [:]
     private static var videoAssets: [URL: AVURLAsset] = [:]
+    private static var videoPosters: [URL: UIImage] = [:]
 
     static func preload(_ media: [OnboardingPageMedia]) {
         for item in media {
@@ -252,6 +253,7 @@ private enum OnboardingMediaPreloader {
 
             case let .video(url):
                 _ = videoAsset(for: url)
+                _ = videoPoster(for: url)
 
             case .systemImage:
                 break
@@ -287,6 +289,26 @@ private enum OnboardingMediaPreloader {
         return asset
     }
 
+    static func videoPoster(for url: URL) -> UIImage? {
+        if let image = videoPosters[url] {
+            return image
+        }
+
+        let asset = videoAsset(for: url)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.requestedTimeToleranceBefore = .zero
+        generator.requestedTimeToleranceAfter = .zero
+
+        guard let cgImage = try? generator.copyCGImage(at: .zero, actualTime: nil) else {
+            return nil
+        }
+
+        let image = UIImage(cgImage: cgImage)
+        videoPosters[url] = image
+        return image
+    }
+
     private static func decoded(_ image: UIImage) -> UIImage {
         guard image.size.width > 0, image.size.height > 0 else {
             return image
@@ -315,7 +337,15 @@ private struct OnboardingAutoplayVideoView: View {
     }
 
     var body: some View {
-        OnboardingAspectFillVideoPlayer(player: controller.player)
+        ZStack {
+            if let posterImage = controller.posterImage {
+                Image(uiImage: posterImage)
+                    .resizable()
+                    .scaledToFill()
+            }
+
+            OnboardingAspectFillVideoPlayer(player: controller.player)
+        }
             .onAppear(perform: updatePlayback)
             .onChange(of: isActive) { updatePlayback() }
             .onDisappear(perform: pause)
@@ -344,12 +374,14 @@ private struct OnboardingAutoplayVideoView: View {
 @MainActor
 private final class OnboardingVideoController: ObservableObject {
     let player: AVPlayer
+    let posterImage: UIImage?
 
     init(url: URL) {
         let asset = OnboardingMediaPreloader.videoAsset(for: url)
         let item = AVPlayerItem(asset: asset)
         item.preferredForwardBufferDuration = 1
 
+        posterImage = OnboardingMediaPreloader.videoPoster(for: url)
         player = AVPlayer(playerItem: item)
         player.isMuted = true
         player.automaticallyWaitsToMinimizeStalling = false
@@ -374,13 +406,19 @@ private struct OnboardingAspectFillVideoPlayer: UIViewRepresentable {
 
     func makeUIView(context: Context) -> OnboardingPlayerView {
         let view = OnboardingPlayerView()
+        view.backgroundColor = .clear
+        view.isOpaque = false
         view.videoGravity = .resizeAspectFill
+        view.playerLayer.backgroundColor = UIColor.clear.cgColor
+        view.playerLayer.isOpaque = false
         view.player = player
         return view
     }
 
     func updateUIView(_ uiView: OnboardingPlayerView, context: Context) {
         uiView.videoGravity = .resizeAspectFill
+        uiView.playerLayer.backgroundColor = UIColor.clear.cgColor
+        uiView.playerLayer.isOpaque = false
         uiView.player = player
     }
 }

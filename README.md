@@ -103,7 +103,7 @@ Use `.systemImage` for SF Symbols.
 
 Use `.image(name:)` for images in the host app's asset catalog. The name should match the asset name. Images are preloaded and decoded when onboarding appears so the active page can show them immediately.
 
-Use `.video(url:)` for a local or remote video URL. Videos are prepared when onboarding appears, play muted, start when their page becomes active, pause when leaving the page, and loop after reaching the end.
+Use `.video(url:)` for a local or remote video URL. Videos are prepared when onboarding appears, show a first-frame poster while playback warms up, play muted, start when their page becomes active, pause when leaving the page, and loop after reaching the end.
 
 Images and videos render directly in a tall portrait viewport, without an extra card or placeholder frame around them. Media fills the viewport so portrait assets use the available height and videos do not show side letterboxing.
 
