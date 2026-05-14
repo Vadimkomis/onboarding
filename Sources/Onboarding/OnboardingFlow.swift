@@ -47,6 +47,9 @@ public struct OnboardingFlow: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 18)
         }
+        .onAppear {
+            OnboardingMediaPreloader.preload(pages.map(\.media))
+        }
     }
 
     @ViewBuilder
@@ -195,12 +198,21 @@ private struct OnboardingMediaView: View {
                 .foregroundColor(theme.accentColor)
 
         case let .image(name):
-            Image(name)
-                .resizable()
-                .scaledToFill()
-                .frame(width: visualSize.width, height: visualSize.height, alignment: .top)
-                .clipped()
-                .frame(width: mediaSize.width, height: mediaSize.height, alignment: .bottom)
+            if let image = OnboardingMediaPreloader.image(named: name) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: visualSize.width, height: visualSize.height, alignment: .top)
+                    .clipped()
+                    .frame(width: mediaSize.width, height: mediaSize.height, alignment: .bottom)
+            } else {
+                Image(name)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: visualSize.width, height: visualSize.height, alignment: .top)
+                    .clipped()
+                    .frame(width: mediaSize.width, height: mediaSize.height, alignment: .bottom)
+            }
 
         case let .video(url):
             OnboardingAutoplayVideoView(url: url, isActive: isActive)
@@ -227,53 +239,138 @@ private enum OnboardingMediaLayout {
     }
 }
 
+@MainActor
+private enum OnboardingMediaPreloader {
+    private static var decodedImages: [String: UIImage] = [:]
+    private static var videoAssets: [URL: AVURLAsset] = [:]
+
+    static func preload(_ media: [OnboardingPageMedia]) {
+        for item in media {
+            switch item {
+            case let .image(name):
+                _ = image(named: name)
+
+            case let .video(url):
+                _ = videoAsset(for: url)
+
+            case .systemImage:
+                break
+            }
+        }
+    }
+
+    static func image(named name: String) -> UIImage? {
+        if let image = decodedImages[name] {
+            return image
+        }
+
+        guard let image = UIImage(named: name) else {
+            return nil
+        }
+
+        let decodedImage = decoded(image)
+        decodedImages[name] = decodedImage
+        return decodedImage
+    }
+
+    static func videoAsset(for url: URL) -> AVURLAsset {
+        if let asset = videoAssets[url] {
+            return asset
+        }
+
+        let asset = AVURLAsset(url: url)
+        videoAssets[url] = asset
+        Task {
+            _ = try? await asset.load(.isPlayable)
+            _ = try? await asset.load(.tracks)
+        }
+        return asset
+    }
+
+    private static func decoded(_ image: UIImage) -> UIImage {
+        guard image.size.width > 0, image.size.height > 0 else {
+            return image
+        }
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        format.opaque = false
+
+        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+        }
+    }
+}
+
 private struct OnboardingAutoplayVideoView: View {
     let url: URL
     let isActive: Bool
 
-    @State private var player: AVPlayer?
+    @StateObject private var controller: OnboardingVideoController
+
+    init(url: URL, isActive: Bool) {
+        self.url = url
+        self.isActive = isActive
+        _controller = StateObject(wrappedValue: OnboardingVideoController(url: url))
+    }
 
     var body: some View {
-        OnboardingAspectFillVideoPlayer(player: player)
+        OnboardingAspectFillVideoPlayer(player: controller.player)
             .onAppear(perform: updatePlayback)
             .onChange(of: isActive) { updatePlayback() }
-            .onDisappear(perform: stop)
+            .onDisappear(perform: pause)
             .onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { notification in
-                guard notification.object as? AVPlayerItem == player?.currentItem else {
+                guard notification.object as? AVPlayerItem == controller.player.currentItem else {
                     return
                 }
 
-                player?.seek(to: .zero)
-                player?.play()
+                controller.restart()
             }
     }
 
     private func updatePlayback() {
         if isActive {
-            play()
+            controller.play()
         } else {
-            stop()
+            pause()
         }
     }
 
-    private func play() {
-        if player == nil {
-            let player = AVPlayer(url: url)
-            player.isMuted = true
-            self.player = player
-        }
+    private func pause() {
+        controller.pause()
+    }
+}
 
-        player?.play()
+@MainActor
+private final class OnboardingVideoController: ObservableObject {
+    let player: AVPlayer
+
+    init(url: URL) {
+        let asset = OnboardingMediaPreloader.videoAsset(for: url)
+        let item = AVPlayerItem(asset: asset)
+        item.preferredForwardBufferDuration = 1
+
+        player = AVPlayer(playerItem: item)
+        player.isMuted = true
+        player.automaticallyWaitsToMinimizeStalling = false
     }
 
-    private func stop() {
-        player?.pause()
-        player = nil
+    func play() {
+        player.play()
+    }
+
+    func pause() {
+        player.pause()
+    }
+
+    func restart() {
+        player.seek(to: .zero)
+        player.play()
     }
 }
 
 private struct OnboardingAspectFillVideoPlayer: UIViewRepresentable {
-    let player: AVPlayer?
+    let player: AVPlayer
 
     func makeUIView(context: Context) -> OnboardingPlayerView {
         let view = OnboardingPlayerView()
