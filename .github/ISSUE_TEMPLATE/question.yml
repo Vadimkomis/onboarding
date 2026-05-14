@@ -1,0 +1,22 @@
+name: Question
+description: Ask a usage or integration question
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are you trying to understand or integrate?
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Relevant code
+      render: swift
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: "1.0.0"

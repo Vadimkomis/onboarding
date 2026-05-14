@@ -9,9 +9,21 @@
 
 A small SwiftUI package for reusable first-run onboarding flows.
 
+## Documentation
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Page Media](#page-media)
+- [Custom Theme](#custom-theme)
+- [Optional Skip](#optional-skip)
+- [API Summary](#api-summary)
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+
 ## Requirements
 
 - iOS 17+
+- Swift 5.9+
 - Swift Package Manager
 
 ## Installation
@@ -27,6 +39,12 @@ git@github.com:Vadimkomis/onboarding.git
 ```
 
 4. Add the `Onboarding` package product to your app target.
+
+For public projects or CI, the HTTPS URL is also supported:
+
+```text
+https://github.com/Vadimkomis/onboarding.git
+```
 
 ## Quick Start
 
@@ -227,6 +245,9 @@ OnboardingFlow(
 
 Onboarding is available under the MIT license. See [LICENSE](LICENSE) for details.
 
-## Changelog
+## Project
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes.
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Support](SUPPORT.md)
+- [Security](SECURITY.md)
