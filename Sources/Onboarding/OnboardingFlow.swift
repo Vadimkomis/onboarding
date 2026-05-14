@@ -186,6 +186,8 @@ private struct OnboardingMediaView: View {
     let mediaSize: CGSize
 
     var body: some View {
+        let visualSize = OnboardingMediaLayout.visualSize(for: mediaSize)
+
         switch media {
         case let .systemImage(systemImage):
             Image(systemName: systemImage)
@@ -196,13 +198,15 @@ private struct OnboardingMediaView: View {
             Image(name)
                 .resizable()
                 .scaledToFill()
-                .frame(width: mediaSize.width, height: mediaSize.height, alignment: .top)
+                .frame(width: visualSize.width, height: visualSize.height, alignment: .top)
                 .clipped()
+                .frame(width: mediaSize.width, height: mediaSize.height, alignment: .bottom)
 
         case let .video(url):
             OnboardingAutoplayVideoView(url: url, isActive: isActive)
-                .frame(width: mediaSize.width, height: mediaSize.height)
+                .frame(width: visualSize.width, height: visualSize.height)
                 .clipped()
+                .frame(width: mediaSize.width, height: mediaSize.height, alignment: .bottom)
         }
     }
 }
@@ -216,6 +220,10 @@ private enum OnboardingMediaLayout {
         let width = min(maxWidth, max(220, height * portraitAspectRatio))
 
         return CGSize(width: width, height: height)
+    }
+
+    static func visualSize(for mediaSize: CGSize) -> CGSize {
+        CGSize(width: mediaSize.width * 1.18, height: mediaSize.height * 1.14)
     }
 }
 
