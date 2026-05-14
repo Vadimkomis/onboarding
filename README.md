@@ -11,7 +11,9 @@ A small SwiftUI package for reusable first-run onboarding flows.
 
 ## Demo
 
-[Watch the onboarding demo](Docs/onboarding-demo.mp4)
+![Onboarding demo](Docs/onboarding-demo.gif)
+
+[Watch the full MP4 demo](Docs/onboarding-demo.mp4)
 
 ## Documentation
 
