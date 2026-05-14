@@ -9,6 +9,10 @@
 
 A small SwiftUI package for reusable first-run onboarding flows.
 
+## Demo
+
+[Watch the onboarding demo](Docs/onboarding-demo.mp4)
+
 ## Documentation
 
 - [Installation](#installation)
