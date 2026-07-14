@@ -7,7 +7,7 @@ Thanks for taking the time to improve Onboarding.
 1. Clone the repository.
 2. For iOS work, open the Swift package in Xcode. For Android work, open the repository in Android Studio.
 3. Install Xcode with an iOS 17 or newer simulator for iOS development.
-4. Install JDK 17 and Android SDK 36 for Android development. The Android library supports devices running API 23 or newer.
+4. Use macOS or Linux with JDK 17 and Android SDK 36 for Android development. The Android library supports devices running API 23 or newer.
 5. Run both platform checks before opening a pull request.
 
 For iOS:

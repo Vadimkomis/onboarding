@@ -43,7 +43,7 @@
 - Name: Android library builds and lints
 - Status: passing
 - Description: Validates that the Android onboarding module produces a release AAR and passes Android lint on the supported toolchain.
-- Notes: Android lint passes with zero errors, all 18 JVM tests pass, the release AAR assembles, Maven-local publication succeeds, and a separate consumer app compiles against the published coordinate. CI runs lint, JVM tests, instrumentation source compilation, release assembly, and isolated Maven-local publication with JDK 17 and Android SDK 36.
+- Notes: The Unix Gradle wrapper runs on the supported macOS/Linux development hosts; no Windows launcher is included. Android lint passes with zero errors, all 18 JVM tests pass, the release AAR assembles, Maven-local publication succeeds, and a separate consumer app compiles against the published coordinate. CI runs lint, JVM tests, instrumentation source compilation, release assembly, and isolated Maven-local publication with JDK 17 and Android SDK 36 on Linux.
 
 - Name: Android flow state matches the onboarding contract
 - Status: passing

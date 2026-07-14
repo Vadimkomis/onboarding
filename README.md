@@ -34,7 +34,7 @@ This demo shows the iOS SwiftUI implementation.
 
 - iOS: iOS 17+, Swift 5.9+, and Swift Package Manager
 - Android: API 23+ and Jetpack Compose
-- Android development: JDK 17 and Android SDK 36
+- Android development: macOS or Linux, JDK 17, and Android SDK 36
 
 ## iOS Installation
 

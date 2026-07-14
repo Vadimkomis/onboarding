@@ -46,6 +46,12 @@ Feature: Onboarding page composition
 
 Feature: Android onboarding support
 
+  Scenario: Build Android support from the intended development hosts
+    Given a contributor uses macOS or Linux
+    When they build the Android onboarding library with the checked-in Gradle wrapper
+    Then the Unix launcher is available without a Windows launcher
+    And the status is "completed"
+
   Scenario: Integrate a native onboarding flow in an Android app
     Given an app targets Android API 23 or newer and uses Jetpack Compose
     When the app adds the onboarding-android library from a source checkout or the local Maven repository
