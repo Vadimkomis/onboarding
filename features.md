@@ -7,6 +7,7 @@ Feature: Project feature tracking
     When a feature is added, changed, or removed
     Then this file is updated first using Gherkin scenarios
     And each scenario reflects user-visible behavior
+    And the status is "completed"
 
 Feature: Keep implementation aligned with specs
 
@@ -15,6 +16,7 @@ Feature: Keep implementation aligned with specs
     When behavior differs from this file
     Then the code is brought into alignment with this spec
     Or the spec is updated with explicit approval
+    And the status is "completed"
 
 Feature: Onboarding completion controls
 
@@ -40,4 +42,30 @@ Feature: Onboarding page composition
     And image and video media are prepared before the active page displays them
     And video media shows a first-frame poster while playback warms up
     And the title and subtitle wrap without being clipped
+    And the status is "completed"
+
+Feature: Android onboarding support
+
+  Scenario: Integrate a native onboarding flow in an Android app
+    Given an app targets Android API 23 or newer and uses Jetpack Compose
+    When the app adds the onboarding-android library from a source checkout or the local Maven repository
+    Then it can configure pages, themes, button titles, skipping, and completion behavior with Android-native APIs
+    And page media accepts a Compose ImageVector, an Android drawable resource, or an Android Uri
+    And the existing Swift Package Manager product remains available for iOS apps
+    And the status is "completed"
+
+  Scenario: Preserve Android onboarding state
+    Given an Android onboarding flow is visible
+    When the activity is recreated after a configuration or process state change
+    Then the selected onboarding page is restored when saved state is available
+    And the default completion store keeps completed onboarding hidden using the caller-provided storage key
+    And callers can inject a completion store for testing or custom persistence
+    And the status is "completed"
+
+  Scenario: Present Android onboarding media safely
+    Given an Android onboarding page uses an ImageVector icon, drawable resource, or video Uri
+    When the page becomes active
+    Then the media fills the same tall portrait viewport used by the onboarding design
+    And video playback is muted, loops, pauses while inactive, and releases resources when removed
+    And poster extraction and media preparation do not block the UI thread
     And the status is "completed"

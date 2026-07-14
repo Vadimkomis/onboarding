@@ -4,12 +4,15 @@
 ![GitHub Tag](https://img.shields.io/github/v/tag/Vadimkomis/onboarding)
 ![License](https://img.shields.io/github/license/Vadimkomis/onboarding)
 ![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-JVM-7F52FF?logo=kotlin&logoColor=white)
 ![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen)
-![Platform](https://img.shields.io/badge/platform-iOS%2017%2B-lightgrey)
+![Platform](https://img.shields.io/badge/platform-iOS%2017%2B%20%7C%20Android%2023%2B-lightgrey)
 
-A small SwiftUI package for reusable first-run onboarding flows.
+Native SwiftUI and Jetpack Compose libraries for reusable first-run onboarding flows.
 
 ## Demo
+
+This demo shows the iOS SwiftUI implementation.
 
 ![Onboarding demo](Docs/onboarding-demo.gif)
 
@@ -17,8 +20,9 @@ A small SwiftUI package for reusable first-run onboarding flows.
 
 ## Documentation
 
-- [Installation](#installation)
-- [Quick Start](#quick-start)
+- [iOS Installation](#ios-installation)
+- [iOS Quick Start](#ios-quick-start)
+- [Android](#android)
 - [Page Media](#page-media)
 - [Custom Theme](#custom-theme)
 - [Optional Skip](#optional-skip)
@@ -28,11 +32,11 @@ A small SwiftUI package for reusable first-run onboarding flows.
 
 ## Requirements
 
-- iOS 17+
-- Swift 5.9+
-- Swift Package Manager
+- iOS: iOS 17+, Swift 5.9+, and Swift Package Manager
+- Android: API 23+ and Jetpack Compose
+- Android development: JDK 17 and Android SDK 36
 
-## Installation
+## iOS Installation
 
 In Xcode:
 
@@ -52,7 +56,7 @@ For public projects or CI, the HTTPS URL is also supported:
 https://github.com/Vadimkomis/onboarding.git
 ```
 
-## Quick Start
+## iOS Quick Start
 
 Import the package where you build your app's root view:
 
@@ -114,6 +118,8 @@ struct RootView: View {
 The number of screens is controlled by the `pages` array. Pass one `OnboardingPage` for a single-screen flow or as many pages as your onboarding needs.
 
 ## Page Media
+
+The following media API is for the SwiftUI library. See [Android](#android) for the Compose equivalents.
 
 Each `OnboardingPage` can show one media type:
 
@@ -219,6 +225,8 @@ Use a unique `storageKey` per app or per onboarding version if you need to show 
 
 ## API Summary
 
+The SwiftUI public API is:
+
 ```swift
 OnboardingGate(
     storageKey: String,
@@ -246,6 +254,128 @@ OnboardingFlow(
     onComplete: @escaping () -> Void
 )
 ```
+
+## Android
+
+The `onboarding-android` module provides the same core onboarding flow as a native Jetpack Compose library for Android API 23 and newer.
+
+### Android installation
+
+Android artifacts are not published to Maven Central or another remote package repository. Clone this repository and publish the release artifact to your local Maven repository:
+
+```sh
+git clone https://github.com/Vadimkomis/onboarding.git
+cd onboarding
+./gradlew :onboarding-android:publishToMavenLocal
+```
+
+The repository's Gradle build includes the library as `:onboarding-android`. Its default local Maven coordinates are `com.vadimkomis:onboarding:1.1.0-SNAPSHOT`.
+
+A module developed inside this source checkout can depend on the Gradle project directly:
+
+```kotlin
+dependencies {
+    implementation(project(":onboarding-android"))
+}
+```
+
+Add `mavenLocal()` to the consuming app's dependency repositories:
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+    }
+}
+```
+
+Then add the dependency to the app module:
+
+```kotlin
+dependencies {
+    implementation("com.vadimkomis:onboarding:1.1.0-SNAPSHOT")
+}
+```
+
+To publish under a different local version, pass the same version to publication and dependency resolution:
+
+```sh
+./gradlew -PVERSION_NAME=1.1.0-local :onboarding-android:publishToMavenLocal
+```
+
+### Android quick start
+
+Create Android-native pages using a Compose `ImageVector`, drawable resource, or video `Uri`:
+
+```kotlin
+val onboardingPages = listOf(
+    OnboardingPage(
+        id = "welcome",
+        title = "Welcome",
+        subtitle = "Show users what your app helps them do.",
+        media = OnboardingPageMedia.Drawable(
+            resourceId = R.drawable.onboarding_welcome,
+            contentDescription = "Welcome illustration",
+        ),
+        accentLabel = "New",
+    ),
+    OnboardingPage(
+        id = "demo",
+        title = "Watch It Work",
+        subtitle = "Show the feature in action.",
+        media = OnboardingPageMedia.Video(
+            uri = Uri.parse("android.resource://${BuildConfig.APPLICATION_ID}/${R.raw.onboarding_demo}"),
+            contentDescription = "Feature demonstration",
+        ),
+        accentLabel = "Demo",
+    ),
+)
+```
+
+Gate the app's main content until onboarding is completed:
+
+```kotlin
+@Composable
+fun RootScreen() {
+    OnboardingGate(
+        storageKey = "hasCompletedOnboarding",
+        pages = onboardingPages,
+    ) {
+        MainAppScreen()
+    }
+}
+```
+
+The default completion store uses a private `SharedPreferences` file and the caller-provided `storageKey`. Pass an `OnboardingCompletionStore` when the app needs custom persistence or a deterministic test store.
+
+Use `OnboardingFlow` directly when the app owns completion state:
+
+```kotlin
+OnboardingFlow(
+    pages = onboardingPages,
+    continueTitle = "Next",
+    completeTitle = "Get Started",
+    skipTitle = "Skip",
+    allowsSkipping = true,
+    onComplete = ::markOnboardingComplete,
+)
+```
+
+Set `allowsSkipping = false` on either `OnboardingGate` or `OnboardingFlow` to require every page. Pass `OnboardingTheme.standard` explicitly or provide a custom `OnboardingTheme` to change the Compose colors and brushes.
+
+Android media constructors are:
+
+```kotlin
+OnboardingPageMedia.Icon(imageVector = appIcon, contentDescription = "App icon")
+OnboardingPageMedia.Drawable(resourceId = R.drawable.onboarding_image, contentDescription = "Preview")
+OnboardingPageMedia.Video(uri = videoUri, contentDescription = "Demo video")
+```
+
+Video pages use Media3. Playback is muted and loops while the page is active, pauses when inactive, and releases the player with the lifecycle. First-frame poster extraction runs off the UI thread and falls back to an empty media viewport when no frame can be loaded.
+
+Apps that use `http` or `https` video URIs must declare `android.permission.INTERNET` in their app manifest. The library does not add network permission to apps that only use local media.
 
 ## License
 
