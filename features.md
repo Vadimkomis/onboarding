@@ -75,3 +75,9 @@ Feature: Android onboarding support
     And video playback is muted, loops, pauses while inactive, and releases resources when removed
     And poster extraction and media preparation do not block the UI thread
     And the status is "completed"
+
+  Scenario: Detect Android visual regressions
+    Given approved Android reference images for the onboarding flow
+    When host-side screenshot validation runs on macOS or Linux
+    Then the initial multi-page flow, single-page completion state, and completed gate content match their references
+    And the status is "completed"

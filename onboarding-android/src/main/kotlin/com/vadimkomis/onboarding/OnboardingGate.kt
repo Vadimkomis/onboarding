@@ -35,6 +35,30 @@ public fun OnboardingGate(
         }
     }
 
+    OnboardingGateState(
+        isCompleted = isCompleted,
+        pages = pages,
+        modifier = modifier,
+        theme = theme,
+        allowsSkipping = allowsSkipping,
+        onComplete = {
+            store.markCompleted(storageKey)
+            isCompleted = true
+        },
+        content = content,
+    )
+}
+
+@Composable
+internal fun OnboardingGateState(
+    isCompleted: Boolean?,
+    pages: List<OnboardingPage>,
+    modifier: Modifier = Modifier,
+    theme: OnboardingTheme = OnboardingTheme.standard,
+    allowsSkipping: Boolean = true,
+    onComplete: () -> Unit,
+    content: @Composable () -> Unit,
+) {
     when (isCompleted) {
         true -> Box(modifier = modifier.testTag(OnboardingTestTags.gateContent)) {
             content()
@@ -45,10 +69,7 @@ public fun OnboardingGate(
             modifier = modifier,
             theme = theme,
             allowsSkipping = allowsSkipping,
-            onComplete = {
-                store.markCompleted(storageKey)
-                isCompleted = true
-            },
+            onComplete = onComplete,
         )
 
         null -> Box(modifier = modifier.fillMaxSize())

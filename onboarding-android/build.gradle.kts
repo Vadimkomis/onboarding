@@ -3,6 +3,7 @@ import org.gradle.api.publish.maven.MavenPublication
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.screenshot)
     `maven-publish`
 }
 
@@ -12,6 +13,7 @@ version = providers.gradleProperty("VERSION_NAME").getOrElse("1.1.0-SNAPSHOT")
 android {
     namespace = "com.vadimkomis.onboarding"
     compileSdk = 36
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
     defaultConfig {
         minSdk = 23
@@ -35,6 +37,12 @@ android {
     lint {
         abortOnError = true
         warningsAsErrors = false
+    }
+
+    testOptions {
+        screenshotTests {
+            imageDifferenceThreshold = 0.0001f
+        }
     }
 
     publishing {
@@ -61,6 +69,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
+    screenshotTestImplementation(platform(libs.androidx.compose.bom))
+    screenshotTestImplementation(libs.androidx.compose.ui.tooling)
+    screenshotTestImplementation(libs.screenshot.validation.api)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 

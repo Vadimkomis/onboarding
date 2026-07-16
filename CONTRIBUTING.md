@@ -22,8 +22,17 @@ For Android:
 ./gradlew \
   :onboarding-android:lint \
   :onboarding-android:testDebugUnitTest \
+  :onboarding-android:validateDebugScreenshotTest \
   :onboarding-android:assembleRelease
 ```
+
+Android screenshot references live under `onboarding-android/src/screenshotTestDebug/reference`. After intentionally changing the Compose UI, review the rendered output and update the references with:
+
+```sh
+./gradlew :onboarding-android:updateDebugScreenshotTest
+```
+
+Commit reference changes only after visually approving all three images. Validation writes an HTML comparison report under `onboarding-android/build/reports/screenshotTest/preview/debug`.
 
 With an API 23 or newer emulator or device connected, run the Compose and media lifecycle instrumentation tests separately:
 

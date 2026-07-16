@@ -56,9 +56,12 @@ jobs:
             -derivedDataPath "$DERIVED_DATA_PATH"
 
   android-checks:
-    name: Android Lint, JVM Tests, AAR, and Publication
-    runs-on: ubuntu-latest
+    name: Android Lint, JVM/Screenshot Tests, AAR, and Publication
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      LANG: en_US.UTF-8
+      TZ: UTC
 
     steps:
       - name: Check out repository
@@ -79,11 +82,21 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Android lint, JVM tests, release assembly, and publication
+      - name: Run Android lint, tests, release assembly, and publication
         run: |
           ./gradlew -Dmaven.repo.local="$RUNNER_TEMP/onboarding-m2" \
             :onboarding-android:lint \
             :onboarding-android:testDebugUnitTest \
+            :onboarding-android:validateDebugScreenshotTest \
             :onboarding-android:compileDebugAndroidTestKotlin \
             :onboarding-android:assembleRelease \
             :onboarding-android:publishToMavenLocal
+
+      - name: Upload Android screenshot report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-screenshot-report
+          path: onboarding-android/build/reports/screenshotTest/preview/debug
+          if-no-files-found: ignore
+          retention-days: 7

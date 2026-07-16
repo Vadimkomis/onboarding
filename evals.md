@@ -43,7 +43,7 @@
 - Name: Android library builds and lints
 - Status: passing
 - Description: Validates that the Android onboarding module produces a release AAR and passes Android lint on the supported toolchain.
-- Notes: The Unix Gradle wrapper runs on the supported macOS/Linux development hosts; no Windows launcher is included. Android lint passes with zero errors, all 18 JVM tests pass, the release AAR assembles, Maven-local publication succeeds, and a separate consumer app compiles against the published coordinate. CI runs lint, JVM tests, instrumentation source compilation, release assembly, and isolated Maven-local publication with JDK 17 and Android SDK 36 on Linux.
+- Notes: The Unix Gradle wrapper runs on the supported macOS/Linux development hosts; no Windows launcher is included. Android lint passes with zero errors, all 18 JVM tests pass, the release AAR assembles, Maven-local publication succeeds, and a separate consumer app compiles against the published coordinate. CI runs lint, JVM tests, host-side screenshot validation, instrumentation source compilation, release assembly, and isolated Maven-local publication with JDK 17 and Android SDK 36 on pinned Ubuntu 24.04.
 
 - Name: Android flow state matches the onboarding contract
 - Status: passing
@@ -65,7 +65,12 @@
 - Description: Validates Android icon, drawable, and video media configuration plus active-only muted looping playback, poster handling, portrait cropping, and cleanup.
 - Notes: `OnboardingPageTest` and `OnboardingFlowLayoutTest` cover native media configuration and portrait bounds. Six passing `OnboardingMediaTest` instrumentation cases cover drawable semantics, active/inactive lifecycle and cleanup, Media3 muted/repeating defaults, real-video poster extraction and preloading, deterministic first-frame state handling, and poster removal after actual Media3 playback renders its first frame.
 
+- Name: Android visual snapshots match approved references
+- Status: passing
+- Description: Validates the rendered Compose UI for the initial multi-page flow, single-page completion state, and completed gate content at a fixed phone viewport.
+- Notes: Three checked-in 1170×2532 reference PNGs render a fixed 390×844dp viewport at 3× density with en-US locale, fixed font scale, test-owned vector media, and the cross-platform snapshot theme. `validateDebugScreenshotTest` passes locally and is a required Android CI task with HTML diff reports uploaded on failure.
+
 - Name: Cross-platform regression suite passes
 - Status: passing
 - Description: Validates that adding Android support does not change the existing iOS package behavior and that both platform test suites run independently.
-- Notes: The unchanged iOS suite passes 18 tests, while Android passes 18 JVM and 17 connected-device tests plus lint, release AAR assembly, isolated Maven-local publication, and a separate consumer build. CI retains the iOS Simulator job and adds Android lint, JVM tests, instrumentation source compilation, release assembly, and publication.
+- Notes: The unchanged iOS suite passes 18 tests, while Android passes 18 JVM, 3 host-side screenshot, and 17 connected-device tests plus lint, release AAR assembly, isolated Maven-local publication, and a separate consumer build. CI retains the iOS Simulator job and adds Android lint, JVM and screenshot tests, instrumentation source compilation, release assembly, and publication.
