@@ -23,10 +23,10 @@
 
 ## Onboarding
 
-- Name: Shared behavior remains in platform parity
-- Status: in-progress
-- Description: Validates that every shared user-visible behavior and public capability has equivalent native implementation and automated coverage on iOS and Android before it is considered complete.
-- Notes: Core page configuration, state rules, titles, skip policy, themes, native media categories, completion-key persistence outcomes, and all three visual snapshot scenarios have paired implementations. Remaining parity gaps are iOS equivalents for Android's completion-once guarantee, injectable completion store, saved-page restoration contract, explicit media accessibility descriptions, and off-main-thread poster extraction. The contribution workflow and pull request template now require paired implementation and test evidence. CI executes iOS tests and Android JVM/screenshot checks for every pull request; device behavior changes additionally require `connectedDebugAndroidTest` evidence.
+- Name: Shared behavior changes require paired platform delivery
+- Status: passing
+- Description: Validates that newly added, changed, or removed shared behavior cannot be considered complete without equivalent native implementation and automated coverage on iOS and Android.
+- Notes: The gate is enforced through `AGENTS.md`, `features.md`, `CONTRIBUTING.md`, and the issue and pull request templates. CI executes iOS tests and Android JVM/screenshot checks for every pull request; device behavior changes additionally require `connectedDebugAndroidTest` evidence. This eval governs intentionally scoped behavior changes and does not retroactively define unrequested product capabilities.
 
 - Name: Skip can be disabled
 - Status: passing

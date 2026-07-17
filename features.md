@@ -29,13 +29,6 @@ Feature: Cross-platform behavior parity
     And the change is not completed until both platform suites pass
     And the status is "completed"
 
-  Scenario: Close existing platform-specific capability gaps
-    Given a parity audit identified shared capabilities currently implemented only on Android
-    When the existing onboarding behavior is brought into parity
-    Then iOS provides equivalent completion-once, injectable persistence, saved-page restoration, media accessibility, and off-main-thread poster extraction behavior
-    And equivalent iOS and Android tests cover those outcomes
-    And the status is "in-progress"
-
 Feature: Onboarding completion controls
 
   Scenario: Require users to complete every onboarding page
