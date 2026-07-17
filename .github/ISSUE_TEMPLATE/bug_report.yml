@@ -17,8 +17,8 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Include iOS version, Xcode version, and device or simulator.
-      placeholder: "iOS 17.5, Xcode 15.4, iPhone 15 simulator"
+      description: Include the platform, OS or API level, toolchain, and device, simulator, or emulator.
+      placeholder: "iOS 17.5 / Xcode 15.4 / iPhone simulator, or Android API 35 / Android Studio / Pixel emulator"
     validations:
       required: true
   - type: textarea
@@ -44,8 +44,15 @@ body:
     validations:
       required: true
   - type: textarea
+    id: other_platform
+    attributes:
+      label: Other platform behavior
+      description: Describe the same scenario on the other supported platform, or state that it has not been tested there.
+    validations:
+      required: true
+  - type: textarea
     id: sample
     attributes:
       label: Minimal sample
-      description: Paste a minimal code snippet or link to a reproduction project.
-      render: swift
+      description: Paste a minimal Swift or Kotlin snippet, or link to a reproduction project.
+      render: text

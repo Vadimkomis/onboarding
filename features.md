@@ -18,6 +18,24 @@ Feature: Keep implementation aligned with specs
     Or the spec is updated with explicit approval
     And the status is "completed"
 
+Feature: Cross-platform behavior parity
+
+  Scenario: Deliver every shared behavior on iOS and Android
+    Given Onboarding is delivered as native SwiftUI and Jetpack Compose libraries
+    When user-visible behavior or a public capability is added, changed, or removed on either platform
+    Then equivalent observable behavior is implemented on both platforms in the same change
+    And equivalent automated tests cover both platforms, including paired snapshots for visual changes
+    And native API shapes may differ while their capabilities remain equivalent
+    And the change is not completed until both platform suites pass
+    And the status is "completed"
+
+  Scenario: Close existing platform-specific capability gaps
+    Given a parity audit identified shared capabilities currently implemented only on Android
+    When the existing onboarding behavior is brought into parity
+    Then iOS provides equivalent completion-once, injectable persistence, saved-page restoration, media accessibility, and off-main-thread poster extraction behavior
+    And equivalent iOS and Android tests cover those outcomes
+    And the status is "in-progress"
+
 Feature: Onboarding completion controls
 
   Scenario: Require users to complete every onboarding page

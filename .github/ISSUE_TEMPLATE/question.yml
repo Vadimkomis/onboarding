@@ -14,7 +14,8 @@ body:
     id: code
     attributes:
       label: Relevant code
-      render: swift
+      description: Include Swift or Kotlin code as appropriate.
+      render: text
   - type: input
     id: version
     attributes:

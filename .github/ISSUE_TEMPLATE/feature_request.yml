@@ -23,6 +23,13 @@ body:
       label: Alternatives considered
       description: Mention workarounds or different API shapes you considered.
   - type: textarea
+    id: platform_parity
+    attributes:
+      label: Platform parity
+      description: Describe the equivalent observable behavior and native API shape for both iOS and Android. Explain any operating-system constraint that could prevent parity.
+    validations:
+      required: true
+  - type: textarea
     id: context
     attributes:
       label: Additional context
