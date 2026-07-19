@@ -18,6 +18,15 @@ Feature: Keep implementation aligned with specs
     Or the spec is updated with explicit approval
     And the status is "completed"
 
+Feature: Continuous integration reliability
+
+  Scenario: Keep Swift compiler state out of dependency caches
+    Given GitHub-hosted macOS runners can update Xcode and SDK files independently of project dependencies
+    When Swift dependencies are restored from the CI cache
+    Then DerivedData and Clang module files are not restored from that cache
+    And Swift tests build against the SDK installed on the current runner
+    And the status is "completed"
+
 Feature: Cross-platform behavior parity
 
   Scenario: Deliver every shared behavior on iOS and Android

@@ -23,6 +23,11 @@
 
 ## Onboarding
 
+- Name: Swift CI cache excludes compiler module state
+- Status: passing
+- Description: Validates that the Swift dependency cache cannot restore DerivedData or Clang module files built against a different Xcode SDK.
+- Notes: `ruby Tests/CI/swift_cache_safety_test.rb` reproduced CI run 29619079137 by failing while `.build/DerivedData` was nested under the cached `.build` path. It now passes because CI stores DerivedData under `runner.temp`, caches only `.build/SourcePackages`, and executes the regression check before restoring the dependency cache.
+
 - Name: Shared behavior changes require paired platform delivery
 - Status: passing
 - Description: Validates that newly added, changed, or removed shared behavior cannot be considered complete without equivalent native implementation and automated coverage on iOS and Android.
