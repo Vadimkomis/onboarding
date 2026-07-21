@@ -13,7 +13,6 @@ Thanks for taking the time to improve Onboarding.
 For iOS:
 
 ```sh
-ruby Tests/CI/swift_cache_safety_test.rb
 xcodebuild test -scheme Onboarding -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
 ```
 

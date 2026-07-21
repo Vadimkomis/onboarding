@@ -25,13 +25,24 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Validate Swift cache safety
-        run: ruby Tests/CI/swift_cache_safety_test.rb
+      - name: Configure and validate Swift cache paths
+        shell: bash
+        run: |
+          derived_data_path="$RUNNER_TEMP/OnboardingDerivedData"
+          cache_path="$GITHUB_WORKSPACE/$SOURCE_PACKAGES_PATH"
+          echo "DERIVED_DATA_PATH=$derived_data_path" >> "$GITHUB_ENV"
+
+          case "$derived_data_path" in
+            "$cache_path"|"$cache_path"/*)
+              echo "::error::Swift dependency cache must not include DerivedData"
+              exit 1
+              ;;
+          esac
 
       - name: Cache Swift package sources
         uses: actions/cache@v4
         with:
-          path: .build/SourcePackages
+          path: ${{ env.SOURCE_PACKAGES_PATH }}
           key: ${{ runner.os }}-swift-packages-${{ hashFiles('Package.resolved', 'Package.swift') }}
           restore-keys: |
             ${{ runner.os }}-swift-packages-
@@ -51,8 +62,6 @@ jobs:
 
       - name: Run tests
         timeout-minutes: 6
-        env:
-          DERIVED_DATA_PATH: ${{ runner.temp }}/OnboardingDerivedData
         run: |
           xcodebuild test \
             -quiet \
