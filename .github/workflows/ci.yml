@@ -19,7 +19,6 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 10
     env:
-      DERIVED_DATA_PATH: ${{ runner.temp }}/OnboardingDerivedData
       SOURCE_PACKAGES_PATH: .build/SourcePackages
 
     steps:
@@ -52,6 +51,8 @@ jobs:
 
       - name: Run tests
         timeout-minutes: 6
+        env:
+          DERIVED_DATA_PATH: ${{ runner.temp }}/OnboardingDerivedData
         run: |
           xcodebuild test \
             -quiet \
