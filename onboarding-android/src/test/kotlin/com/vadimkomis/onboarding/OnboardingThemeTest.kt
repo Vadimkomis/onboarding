@@ -43,7 +43,7 @@ class OnboardingThemeTest {
         assertNotNull(theme.background)
         assertEquals(Color(0xFF111827), theme.cardColor)
         assertEquals(Color(0xFF1F2937), theme.raisedColor)
-        assertEquals(Color(0x33256FE8), theme.highlightColor)
+        assertEquals(Color(0x331D4ED8), theme.highlightColor)
         assertEquals(Color(0xFFF9FAFB), theme.primaryTextColor)
         assertEquals(Color(0xFFAAB2C0), theme.secondaryTextColor)
         assertEquals(Color(0xFF2563EB), theme.accentColor)

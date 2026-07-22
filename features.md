@@ -38,6 +38,12 @@ Feature: Cross-platform behavior parity
     And the change is not completed until both platform suites pass
     And the status is "completed"
 
+  Scenario: Match the standard theme highlight color
+    Given an app uses the standard onboarding theme on iOS and Android
+    When the highlight color is rendered or read through the public theme API
+    Then both platforms use #1D4ED8 at 20 percent opacity
+    And the status is "completed"
+
 Feature: Onboarding completion controls
 
   Scenario: Require users to complete every onboarding page
@@ -60,7 +66,7 @@ Feature: Onboarding page composition
     Then the media is shown directly in a tall portrait viewport without a placeholder card around it
     And image and video media fill the viewport without side letterboxing
     And image and video media are prepared before the active page displays them
-    And video media shows a first-frame poster while playback warms up
+    And video media shows a first-frame poster while playback warms up when extraction fits the platform's memory-safe bounds
     And the title and subtitle wrap without being clipped
     And the status is "completed"
 
@@ -77,6 +83,7 @@ Feature: Android onboarding support
     When the app adds the onboarding-android library from a source checkout or the local Maven repository
     Then it can configure pages, themes, button titles, skipping, and completion behavior with Android-native APIs
     And page media accepts a Compose ImageVector, an Android drawable resource, or an Android Uri
+    And the documented video resource URI uses the runtime application package without requiring BuildConfig generation
     And the existing Swift Package Manager product remains available for iOS apps
     And the status is "completed"
 
@@ -93,7 +100,10 @@ Feature: Android onboarding support
     When the page becomes active
     Then the media fills the same tall portrait viewport used by the onboarding design
     And video playback is muted, loops, pauses while inactive, and releases resources when removed
-    And poster extraction and media preparation do not block the UI thread
+    And drawable decoding and poster extraction do not block the UI thread
+    And configuration-qualified drawables reload automatically after configuration or context changes
+    And callers can increment a drawable resource theme version after mutating the same context theme in place
+    And API 23 through 26 skips unbounded poster extraction and falls through to the player-rendered first frame
     And the status is "completed"
 
   Scenario: Detect Android visual regressions

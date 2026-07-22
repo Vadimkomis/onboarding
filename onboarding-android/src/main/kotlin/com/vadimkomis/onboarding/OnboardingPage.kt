@@ -26,6 +26,7 @@ public sealed interface OnboardingPageMedia {
     public data class Drawable(
         @param:DrawableRes public val resourceId: Int,
         public override val contentDescription: String? = null,
+        public val resourceThemeVersion: Int = 0,
     ) : OnboardingPageMedia
 
     public data class Video(

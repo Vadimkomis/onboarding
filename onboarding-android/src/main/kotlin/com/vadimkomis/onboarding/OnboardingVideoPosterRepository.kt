@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.util.LruCache
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -21,6 +22,21 @@ import kotlinx.coroutines.withContext
 
 private const val mediaLogTag = "OnboardingMedia"
 private const val posterCacheSizeKiB = 16 * 1024
+private const val posterMaxWidth = 640
+private const val posterMaxHeight = 1_024
+
+internal fun interface VideoPosterFrameRetriever {
+    fun getScaledFrame(maxWidth: Int, maxHeight: Int): Bitmap?
+}
+
+internal fun extractPosterFrame(
+    sdkInt: Int,
+    retriever: VideoPosterFrameRetriever,
+): Bitmap? = if (sdkInt >= Build.VERSION_CODES.O_MR1) {
+    retriever.getScaledFrame(posterMaxWidth, posterMaxHeight)
+} else {
+    null
+}
 
 @Composable
 internal fun rememberVideoPoster(uri: Uri): ImageBitmap? {
@@ -64,25 +80,31 @@ internal object VideoPosterRepository {
 }
 
 private fun extractVideoPoster(context: Context, uri: Uri): Bitmap? {
-    val retriever = MediaMetadataRetriever()
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) return null
+    val platformRetriever = MediaMetadataRetriever()
     return try {
-        setRetrieverDataSource(retriever, context, uri)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            retriever.getScaledFrameAtTime(
-                0,
-                MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
-                640,
-                1_024,
-            )
-        } else {
-            retriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
-        }
+        setRetrieverDataSource(platformRetriever, context, uri)
+        val retriever = MediaMetadataVideoPosterFrameRetriever(platformRetriever)
+        extractPosterFrame(Build.VERSION.SDK_INT, retriever)
     } catch (error: Exception) {
         Log.w(mediaLogTag, "Unable to extract ${uri.scheme ?: "unknown"} video poster", error)
         null
     } finally {
-        releaseRetriever(retriever)
+        releaseRetriever(platformRetriever)
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O_MR1)
+private class MediaMetadataVideoPosterFrameRetriever(
+    private val retriever: MediaMetadataRetriever,
+) : VideoPosterFrameRetriever {
+    override fun getScaledFrame(maxWidth: Int, maxHeight: Int): Bitmap? =
+        retriever.getScaledFrameAtTime(
+            0,
+            MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
+            maxWidth,
+            maxHeight,
+        )
 }
 
 private fun setRetrieverDataSource(

@@ -24,7 +24,7 @@ public data class OnboardingTheme(
             ),
             cardColor = Color(0xFF111827),
             raisedColor = Color(0xFF1F2937),
-            highlightColor = Color(0x33256FE8),
+            highlightColor = Color(0x331D4ED8),
             primaryTextColor = Color(0xFFF9FAFB),
             secondaryTextColor = Color(0xFFAAB2C0),
             accentColor = Color(0xFF2563EB),

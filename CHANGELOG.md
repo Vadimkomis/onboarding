@@ -16,6 +16,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Host-side Android screenshot tests with checked-in references for the initial flow, single-page completion state, and completed gate content.
 - Source-checkout and local Maven workflows for consuming the Android library during development.
 
+### Fixed
+
+- Removed the Android quick start's dependency on generated `BuildConfig` fields.
+- Moved Android drawable loading off the UI thread and made configuration and in-place theme invalidation explicit.
+- Skipped poster extraction on API 23–26, where the platform cannot bound full-frame decoding.
+- Matched the Android standard highlight color to the iOS palette.
+
 ## [1.0.0] - 2026-05-14
 
 ### Added

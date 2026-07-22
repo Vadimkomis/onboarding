@@ -310,27 +310,47 @@ To publish under a different local version, pass the same version to publication
 Create Android-native pages using a Compose `ImageVector`, drawable resource, or video `Uri`:
 
 ```kotlin
-val onboardingPages = listOf(
-    OnboardingPage(
-        id = "welcome",
-        title = "Welcome",
-        subtitle = "Show users what your app helps them do.",
-        media = OnboardingPageMedia.Drawable(
-            resourceId = R.drawable.onboarding_welcome,
-            contentDescription = "Welcome illustration",
-        ),
-        accentLabel = "New",
-    ),
-    OnboardingPage(
-        id = "demo",
-        title = "Watch It Work",
-        subtitle = "Show the feature in action.",
-        media = OnboardingPageMedia.Video(
-            uri = Uri.parse("android.resource://${BuildConfig.APPLICATION_ID}/${R.raw.onboarding_demo}"),
-            contentDescription = "Feature demonstration",
-        ),
-        accentLabel = "Demo",
-    ),
+@Composable
+private fun rememberOnboardingPages(): List<OnboardingPage> {
+    val context = LocalContext.current
+    val packageName = context.packageName
+
+    return remember(packageName) {
+        listOf(
+            OnboardingPage(
+                id = "welcome",
+                title = "Welcome",
+                subtitle = "Show users what your app helps them do.",
+                media = OnboardingPageMedia.Drawable(
+                    resourceId = R.drawable.onboarding_welcome,
+                    contentDescription = "Welcome illustration",
+                ),
+                accentLabel = "New",
+            ),
+            OnboardingPage(
+                id = "demo",
+                title = "Watch It Work",
+                subtitle = "Show the feature in action.",
+                media = OnboardingPageMedia.Video(
+                    uri = Uri.parse("android.resource://$packageName/${R.raw.onboarding_demo}"),
+                    contentDescription = "Feature demonstration",
+                ),
+                accentLabel = "Demo",
+            ),
+        )
+    }
+}
+```
+
+Configuration and context changes reload drawable resources automatically. If the host mutates
+the same Android `Resources.Theme` instance in place, rebuild the drawable media with an
+incremented `resourceThemeVersion` so themed resources are re-resolved:
+
+```kotlin
+OnboardingPageMedia.Drawable(
+    resourceId = R.drawable.onboarding_welcome,
+    contentDescription = "Welcome illustration",
+    resourceThemeVersion = appThemeVersion,
 )
 ```
 
@@ -339,6 +359,8 @@ Gate the app's main content until onboarding is completed:
 ```kotlin
 @Composable
 fun RootScreen() {
+    val onboardingPages = rememberOnboardingPages()
+
     OnboardingGate(
         storageKey = "hasCompletedOnboarding",
         pages = onboardingPages,

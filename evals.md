@@ -50,10 +50,30 @@
 
 ## Android
 
+- Name: Android quick start avoids generated BuildConfig
+- Status: passing
+- Description: Validates that the documented Android video resource URI uses the runtime application package without requiring generated BuildConfig fields.
+- Notes: `ReadmeQuickStartTest` extracts the Android quick start, rejects `BuildConfig`, and verifies the exact runtime-package URI interpolation.
+
+- Name: Standard highlight color matches across platforms
+- Status: passing
+- Description: Validates that the public standard themes use #1D4ED8 at 20 percent opacity on both iOS and Android.
+- Notes: Exact Android and iOS assertions lock the standard highlight to the same color and opacity.
+
+- Name: Android drawable loading is asynchronous and configuration-aware
+- Status: passing
+- Description: Validates that drawable resources are decoded off the UI thread and reloaded for configuration, context, or explicitly versioned in-place theme changes.
+- Notes: Instrumentation coverage verifies background loading, density/locale/ui-mode reloads, replacement contexts, retained-context theme versioning, immutable theme snapshots, bounded bitmap-only caching, isolated cached drawable instances, and independent video-poster preloading during drawable reloads.
+
+- Name: Legacy Android video poster extraction avoids unbounded decoding
+- Status: passing
+- Description: Validates that API 23 through 26 never requests a full-resolution poster frame when the platform cannot bound the decode.
+- Notes: Deterministic JVM coverage proves API 23 through 26 skips poster extraction and API 27 or newer requests only a 640×1024 scaled frame. Legacy playback falls through to the player-rendered first frame.
+
 - Name: Android library builds and lints
 - Status: passing
 - Description: Validates that the Android onboarding module produces a release AAR and passes Android lint on the supported toolchain.
-- Notes: The Unix Gradle wrapper runs on the supported macOS/Linux development hosts; no Windows launcher is included. Android lint passes with zero errors, all 18 JVM tests pass, the release AAR assembles, Maven-local publication succeeds, and a separate consumer app compiles against the published coordinate. CI runs lint, JVM tests, host-side screenshot validation, instrumentation source compilation, release assembly, and isolated Maven-local publication with JDK 17 and Android SDK 36 on pinned Ubuntu 24.04.
+- Notes: The Unix Gradle wrapper runs on the supported macOS/Linux development hosts; no Windows launcher is included. Android lint passes with zero errors, all 22 JVM tests pass, the release AAR assembles, Maven-local publication succeeds, and a separate consumer app compiles against the published coordinate. CI runs lint, JVM tests, host-side screenshot validation, instrumentation source compilation, release assembly, and isolated Maven-local publication with JDK 17 and Android SDK 36 on pinned Ubuntu 24.04.
 
 - Name: Android flow state matches the onboarding contract
 - Status: passing
@@ -73,7 +93,7 @@
 - Name: Android media follows lifecycle and layout rules
 - Status: passing
 - Description: Validates Android icon, drawable, and video media configuration plus active-only muted looping playback, poster handling, portrait cropping, and cleanup.
-- Notes: `OnboardingPageTest` and `OnboardingFlowLayoutTest` cover native media configuration and portrait bounds. Six passing `OnboardingMediaTest` instrumentation cases cover drawable semantics, active/inactive lifecycle and cleanup, Media3 muted/repeating defaults, real-video poster extraction and preloading, deterministic first-frame state handling, and poster removal after actual Media3 playback renders its first frame.
+- Notes: Media coverage includes background drawable decoding, automatic configuration/context reloads, explicit retained-context theme invalidation, independent preloading, skipped unbounded poster extraction on API 23 through 26, player lifecycle, portrait cropping, and cleanup.
 
 - Name: Android visual snapshots match approved references
 - Status: passing
@@ -83,4 +103,4 @@
 - Name: Cross-platform regression suite passes
 - Status: passing
 - Description: Validates that adding Android support does not change the existing iOS package behavior and that both platform test suites run independently.
-- Notes: The unchanged iOS suite passes 18 tests, while Android passes 18 JVM, 3 host-side screenshot, and 17 connected-device tests plus lint, release AAR assembly, isolated Maven-local publication, and a separate consumer build. CI retains the iOS Simulator job and adds Android lint, JVM and screenshot tests, instrumentation source compilation, release assembly, and publication.
+- Notes: iOS passes 19 tests, while Android passes 22 JVM, 3 host-side screenshot, and 25 connected-device tests plus lint, release AAR assembly, isolated Maven-local publication, and a separate consumer build. CI retains the iOS Simulator job and adds Android lint, JVM and screenshot tests, instrumentation source compilation, release assembly, and publication.

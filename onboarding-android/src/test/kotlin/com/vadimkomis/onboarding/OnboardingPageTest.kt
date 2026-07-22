@@ -42,6 +42,16 @@ class OnboardingPageTest {
 
         assertEquals(42, media.resourceId)
         assertNull(media.contentDescription)
+        assertEquals(0, media.resourceThemeVersion)
     }
 
+    @Test
+    fun drawableStoresExplicitResourceThemeVersion() {
+        val media = OnboardingPageMedia.Drawable(
+            resourceId = 42,
+            resourceThemeVersion = 3,
+        )
+
+        assertEquals(3, media.resourceThemeVersion)
+    }
 }
