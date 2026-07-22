@@ -7,6 +7,7 @@ Feature: Project feature tracking
     When a feature is added, changed, or removed
     Then this file is updated first using Gherkin scenarios
     And each scenario reflects user-visible behavior
+    And the status is "completed"
 
 Feature: Keep implementation aligned with specs
 
@@ -15,6 +16,33 @@ Feature: Keep implementation aligned with specs
     When behavior differs from this file
     Then the code is brought into alignment with this spec
     Or the spec is updated with explicit approval
+    And the status is "completed"
+
+Feature: Continuous integration reliability
+
+  Scenario: Keep Swift compiler state out of dependency caches
+    Given GitHub-hosted macOS runners can update Xcode and SDK files independently of project dependencies
+    When Swift dependencies are restored from the CI cache
+    Then DerivedData and Clang module files are not restored from that cache
+    And Swift tests build against the SDK installed on the current runner
+    And the status is "completed"
+
+Feature: Cross-platform behavior parity
+
+  Scenario: Deliver every shared behavior on iOS and Android
+    Given Onboarding is delivered as native SwiftUI and Jetpack Compose libraries
+    When user-visible behavior or a public capability is added, changed, or removed on either platform
+    Then equivalent observable behavior is implemented on both platforms in the same change
+    And equivalent automated tests cover both platforms, including paired snapshots for visual changes
+    And native API shapes may differ while their capabilities remain equivalent
+    And the change is not completed until both platform suites pass
+    And the status is "completed"
+
+  Scenario: Match the standard theme highlight color
+    Given an app uses the standard onboarding theme on iOS and Android
+    When the highlight color is rendered or read through the public theme API
+    Then both platforms use #1D4ED8 at 20 percent opacity
+    And the status is "completed"
 
 Feature: Onboarding completion controls
 
@@ -38,6 +66,48 @@ Feature: Onboarding page composition
     Then the media is shown directly in a tall portrait viewport without a placeholder card around it
     And image and video media fill the viewport without side letterboxing
     And image and video media are prepared before the active page displays them
-    And video media shows a first-frame poster while playback warms up
+    And video media shows a first-frame poster while playback warms up when extraction fits the platform's memory-safe bounds
     And the title and subtitle wrap without being clipped
+    And the status is "completed"
+
+Feature: Android onboarding support
+
+  Scenario: Build Android support from the intended development hosts
+    Given a contributor uses macOS or Linux
+    When they build the Android onboarding library with the checked-in Gradle wrapper
+    Then the Unix launcher is available without a Windows launcher
+    And the status is "completed"
+
+  Scenario: Integrate a native onboarding flow in an Android app
+    Given an app targets Android API 23 or newer and uses Jetpack Compose
+    When the app adds the onboarding-android library from a source checkout or the local Maven repository
+    Then it can configure pages, themes, button titles, skipping, and completion behavior with Android-native APIs
+    And page media accepts a Compose ImageVector, an Android drawable resource, or an Android Uri
+    And the documented video resource URI uses the runtime application package without requiring BuildConfig generation
+    And the existing Swift Package Manager product remains available for iOS apps
+    And the status is "completed"
+
+  Scenario: Preserve Android onboarding state
+    Given an Android onboarding flow is visible
+    When the activity is recreated after a configuration or process state change
+    Then the selected onboarding page is restored when saved state is available
+    And the default completion store keeps completed onboarding hidden using the caller-provided storage key
+    And callers can inject a completion store for testing or custom persistence
+    And the status is "completed"
+
+  Scenario: Present Android onboarding media safely
+    Given an Android onboarding page uses an ImageVector icon, drawable resource, or video Uri
+    When the page becomes active
+    Then the media fills the same tall portrait viewport used by the onboarding design
+    And video playback is muted, loops, pauses while inactive, and releases resources when removed
+    And drawable decoding and poster extraction do not block the UI thread
+    And configuration-qualified drawables reload automatically after configuration or context changes
+    And callers can increment a drawable resource theme version after mutating the same context theme in place
+    And API 23 through 26 skips unbounded poster extraction and falls through to the player-rendered first frame
+    And the status is "completed"
+
+  Scenario: Detect Android visual regressions
+    Given approved Android reference images for the onboarding flow
+    When host-side screenshot validation runs on macOS or Linux
+    Then the initial multi-page flow, single-page completion state, and completed gate content match their references
     And the status is "completed"

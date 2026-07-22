@@ -52,4 +52,16 @@ final class OnboardingThemeTests: XCTestCase {
         XCTAssertNotNil(theme.borderColor)
         XCTAssertNotNil(theme.buttonGradient)
     }
+
+    func testStandardThemeMatchesCrossPlatformHighlightColor() {
+        let expectedHighlightColor = Color(
+            .sRGB,
+            red: Double(0x1D) / 255.0,
+            green: Double(0x4E) / 255.0,
+            blue: Double(0xD8) / 255.0,
+            opacity: 0.2
+        )
+
+        XCTAssertEqual(OnboardingTheme.standard.highlightColor, expectedHighlightColor)
+    }
 }

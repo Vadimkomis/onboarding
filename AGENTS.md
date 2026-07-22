@@ -1,7 +1,8 @@
 # Development Guidelines (Codex Mirror)
 
 > **Source of truth:** `../Claude/CLAUDE.md`.
-> This file should stay as close as possible to `../Claude/CLAUDE.md`, with one intentional difference: this file uses Codex `skills/` instead of Claude subagents.
+> This file should stay as close as possible to `../Claude/CLAUDE.md`, with Codex `skills/` replacing Claude subagents. Repository-specific requirements are labeled separately below.
+> **Project-specific addition:** The Platform Parity rules below are required for this two-platform library.
 
 This file mirrors the macro development rules for Codex CLI usage (open-source agentic coding interface; not the legacy OpenAI Codex model).
 
@@ -9,7 +10,7 @@ This file mirrors the macro development rules for Codex CLI usage (open-source a
 
 1. Use `../Claude/CLAUDE.md` as the macro source of truth — use this `AGENTS.md` as the Codex mirror
 2. Create an `AGENTS.md` in the project root as the Codex mirror
-3. Keep this `AGENTS.md` aligned with `../Claude/CLAUDE.md`; do not diverge except for the skills/agents adaptation
+3. Keep this `AGENTS.md` aligned with `../Claude/CLAUDE.md`; limit divergence to the skills/agents adaptation and clearly labeled repository-specific requirements
 4. Create a `features.md` in the project root — this is the **single source of truth** for all features (see [Feature Tracking](#feature-tracking) below)
 5. Create an `evals.md` in the project root — this is the **single source of truth** for project evals (see [Evals](#evals) below)
 6. Set up a linter configuration appropriate to the project's language(s)
@@ -76,6 +77,22 @@ The exact format can be adapted per project, but every eval entry must at minimu
 
 ---
 
+## Platform Parity
+
+Onboarding is one product delivered through native iOS and Android libraries. Shared behavior must remain equivalent even when SwiftUI and Compose require different implementation details or API naming.
+
+### Rules
+
+- **Ship shared behavior together** — when user-visible behavior or a public capability is added, changed, or removed on either iOS or Android, implement the equivalent behavior on the other platform in the same change
+- **Specify outcomes platform-neutrally** — describe shared behavior in `features.md` before implementation, then add platform-specific details only where native frameworks require them
+- **Require paired coverage** — add or update automated tests for equivalent outcomes and edge cases on both platforms; visual changes require approved iOS and Android snapshots
+- **Keep status honest** — do not mark a shared feature completed or its eval passing until both implementations and both platform suites pass
+- **Document native differences** — Swift and Kotlin API shapes may be idiomatic, but their capabilities and observable results must remain equivalent
+- **Escalate unavoidable divergence** — if an operating-system constraint prevents parity, stop and obtain explicit user approval before implementing or documenting a platform-specific exception
+- Platform-specific build tooling is outside this rule only when it cannot affect shared runtime behavior or public capability
+
+---
+
 ## Workflow
 
 ### Pre-Commit Requirements
@@ -93,6 +110,7 @@ The exact format can be adapted per project, but every eval entry must at minimu
 - [ ] Unit tests added/updated for all changes (mandatory)
 - [ ] Tests pass before committing
 - [ ] Update `features.md` when changing user-facing behavior
+- [ ] Shared behavior and equivalent tests are implemented on both iOS and Android
 - [ ] Heavy work runs off the main/UI thread
 - [ ] UI updates happen on the main/UI thread
 - [ ] Errors are typed and have user-facing descriptions

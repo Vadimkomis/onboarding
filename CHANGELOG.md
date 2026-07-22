@@ -5,6 +5,21 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Native Jetpack Compose onboarding library for Android API 23 and newer.
+- Android page media backed by Compose `ImageVector`, drawable resources, and video `Uri` values.
+- Android completion persistence using a caller-provided storage key.
+- Gradle tasks and CI coverage for Android lint, JVM tests, instrumentation test compilation, release AAR assembly, and local Maven publication.
+- Host-side Android screenshot tests with checked-in references for the initial flow, single-page completion state, and completed gate content.
+- Source-checkout and local Maven workflows for consuming the Android library during development.
+- Android quick-start resource URIs built from the runtime package without generated `BuildConfig` fields.
+- Background Android drawable loading with configuration and in-place theme invalidation.
+- Allocation-safe Android video posters using scaled extraction on API 27 and newer and player-rendered fallback on API 23–26.
+- Android standard highlight color matching the iOS palette.
+
 ## [1.0.0] - 2026-05-14
 
 ### Added
@@ -24,4 +39,3 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `OnboardingGate` persistence through a caller-provided `storageKey`.
 - GitHub Actions CI for iOS tests.
 - MIT license.
-
