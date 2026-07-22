@@ -264,12 +264,12 @@ The `onboarding-android` module provides the same core onboarding flow as a nati
 Android artifacts are not published to Maven Central or another remote package repository. Clone this repository and publish the release artifact to your local Maven repository:
 
 ```sh
-git clone https://github.com/Vadimkomis/onboarding.git
+git clone --branch 1.1.0 --depth 1 https://github.com/Vadimkomis/onboarding.git
 cd onboarding
 ./gradlew :onboarding-android:publishToMavenLocal
 ```
 
-The repository's Gradle build includes the library as `:onboarding-android`. Its default local Maven coordinates are `com.vadimkomis:onboarding:1.1.0-SNAPSHOT`.
+The repository's Gradle build includes the library as `:onboarding-android`. Its default local Maven coordinates are `com.vadimkomis:onboarding:1.1.0`.
 
 A module developed inside this source checkout can depend on the Gradle project directly:
 
@@ -295,7 +295,7 @@ Then add the dependency to the app module:
 
 ```kotlin
 dependencies {
-    implementation("com.vadimkomis:onboarding:1.1.0-SNAPSHOT")
+    implementation("com.vadimkomis:onboarding:1.1.0")
 }
 ```
 

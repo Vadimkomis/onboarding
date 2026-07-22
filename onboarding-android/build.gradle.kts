@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.vadimkomis"
-version = providers.gradleProperty("VERSION_NAME").getOrElse("1.1.0-SNAPSHOT")
+version = providers.gradleProperty("VERSION_NAME").getOrElse("1.1.0")
 
 android {
     namespace = "com.vadimkomis.onboarding"
