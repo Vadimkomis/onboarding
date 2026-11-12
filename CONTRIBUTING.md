@@ -13,8 +13,11 @@ Thanks for taking the time to improve Onboarding.
 For iOS:
 
 ```sh
-xcodebuild test -scheme Onboarding -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
+(cd Tests && xcodebuild test -scheme OnboardingTests-Package -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest')
 ```
+
+The iOS tests are a separate Swift package in `Tests/`, so apps that add Onboarding do not download
+test-only dependencies. Open `Tests/Package.swift` in Xcode to run them there.
 
 For Android:
 

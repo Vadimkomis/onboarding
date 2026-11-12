@@ -43,7 +43,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.SOURCE_PACKAGES_PATH }}
-          key: ${{ runner.os }}-swift-packages-${{ hashFiles('Package.resolved', 'Package.swift') }}
+          key: ${{ runner.os }}-swift-packages-${{ hashFiles('Tests/Package.resolved', 'Tests/Package.swift', 'Package.swift') }}
           restore-keys: |
             ${{ runner.os }}-swift-packages-
 
@@ -55,21 +55,23 @@ jobs:
           xcodebuild -showsdks
 
       - name: Show destinations
+        working-directory: Tests
         run: |
           xcodebuild -showdestinations \
-            -scheme Onboarding \
-            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES_PATH"
+            -scheme OnboardingTests-Package \
+            -clonedSourcePackagesDirPath "$GITHUB_WORKSPACE/$SOURCE_PACKAGES_PATH"
 
       - name: Run tests
         timeout-minutes: 6
+        working-directory: Tests
         run: |
           xcodebuild test \
             -quiet \
-            -scheme Onboarding \
+            -scheme OnboardingTests-Package \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -destination-timeout 60 \
             -parallel-testing-enabled NO \
-            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES_PATH" \
+            -clonedSourcePackagesDirPath "$GITHUB_WORKSPACE/$SOURCE_PACKAGES_PATH" \
             -derivedDataPath "$DERIVED_DATA_PATH"
 
   android-checks:

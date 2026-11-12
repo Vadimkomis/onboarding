@@ -27,6 +27,13 @@ Feature: Continuous integration reliability
     And Swift tests build against the SDK installed on the current runner
     And the status is "completed"
 
+  Scenario: Keep test-only dependencies out of consuming apps
+    Given an app adds the Onboarding Swift package
+    When Xcode resolves the app's package dependencies
+    Then the Onboarding package contributes no dependencies of its own
+    And the iOS tests run from a separate package that depends on Onboarding
+    And the status is "completed"
+
 Feature: Cross-platform behavior parity
 
   Scenario: Deliver every shared behavior on iOS and Android

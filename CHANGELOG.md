@@ -17,6 +17,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Changed
 
 - The Android library now supports apps built with Kotlin 2.1 and Jetpack Compose 1.8. It no longer raises a consuming app's Kotlin standard library, Compose, or lifecycle versions.
+- The Swift package no longer declares test-only dependencies, so apps that add it stop downloading `swift-snapshot-testing` and its dependencies. The iOS tests moved to their own package in `Tests/`.
 - VoiceOver now announces the iOS progress indicator, matching TalkBack on Android.
 - iOS page media without a `mediaAccessibilityLabel` is hidden from VoiceOver instead of announcing its symbol or asset name.
 - Android apps compiled against 1.1.0 must be recompiled, because `OnboardingFlow` and `OnboardingTheme` gained optional parameters.

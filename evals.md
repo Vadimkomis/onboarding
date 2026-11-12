@@ -26,7 +26,12 @@
 - Name: Swift CI cache excludes compiler module state
 - Status: passing
 - Description: Confirms that the Swift dependency cache does not restore DerivedData or Clang module files built against a different Xcode SDK.
-- Notes: Before restoring the cache, an inline shell check configures DerivedData under `RUNNER_TEMP` and rejects paths nested under the cached package-source path. The job caches only `.build/SourcePackages`, preserving the regression coverage without a separate script file.
+- Notes: Before restoring the cache, an inline shell check configures DerivedData under `RUNNER_TEMP` and rejects paths nested under the cached package-source path. The job caches only `.build/SourcePackages`, keyed on the test package manifest and pins, preserving the regression coverage without a separate script file.
+
+- Name: Swift package declares no test-only dependencies
+- Status: passing
+- Description: Confirms that apps adding the Onboarding package resolve no extra packages because the iOS tests live in their own package.
+- Notes: The root `Package.swift` has no `dependencies`. `Tests/Package.swift` depends on the root package by path and on `swift-snapshot-testing`; all 30 iOS tests pass from it with the `OnboardingTests-Package` scheme. A consuming app's build resolved only its own packages.
 
 - Name: Shared behavior changes require paired platform delivery
 - Status: passing

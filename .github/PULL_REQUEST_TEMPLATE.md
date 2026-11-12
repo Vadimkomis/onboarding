@@ -10,7 +10,7 @@
 
 ## Testing
 
-- [ ] `xcodebuild test -scheme Onboarding -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'`
+- [ ] `(cd Tests && xcodebuild test -scheme OnboardingTests-Package -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest')`
 - [ ] `./gradlew :onboarding-android:lint :onboarding-android:testDebugUnitTest :onboarding-android:validateDebugScreenshotTest :onboarding-android:assembleRelease`
 - [ ] `./gradlew :onboarding-android:connectedDebugAndroidTest` when device behavior changes
 
