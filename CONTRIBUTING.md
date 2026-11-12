@@ -46,7 +46,7 @@ To exercise the Android library from a separate app, publish the source checkout
 ./gradlew :onboarding-android:publishToMavenLocal
 ```
 
-The Android artifact is not published to Maven Central or another remote repository.
+Releases are published through JitPack, which builds the Android artifact from the Git tag using `jitpack.yml`. Keep the library's Kotlin language level and declared Compose and lifecycle versions at the documented consumer floor so older apps can adopt it.
 
 ## Platform Parity
 

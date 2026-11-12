@@ -47,7 +47,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -82,6 +81,8 @@ public fun OnboardingFlow(
     completeTitle: String = "Get Started",
     skipTitle: String = "Skip",
     allowsSkipping: Boolean = true,
+    progressDescription: (currentPage: Int, pageCount: Int) -> String =
+        ::defaultOnboardingProgressDescription,
     onComplete: () -> Unit,
 ) {
     val pagerState = rememberOnboardingPagerState(pages)
@@ -91,7 +92,13 @@ public fun OnboardingFlow(
 
     PreloadOnboardingMedia(pages.map(OnboardingPage::media))
     OnboardingSurface(modifier, theme) {
-        OnboardingProgress(pages.size, state.selectedIndex, theme)
+        val currentPage = if (pages.isEmpty()) 0 else state.selectedIndex + 1
+        OnboardingProgress(
+            pageCount = pages.size,
+            selectedIndex = state.selectedIndex,
+            description = progressDescription(currentPage, pages.size),
+            theme = theme,
+        )
         PagePager(pages, pagerState, theme, Modifier.weight(1f))
         OnboardingControls(
             primaryTitle = if (state.isLastPage) completeTitle else continueTitle,
@@ -167,6 +174,9 @@ private fun rememberCompletionCallback(
     }
 }
 
+internal fun defaultOnboardingProgressDescription(currentPage: Int, pageCount: Int): String =
+    if (pageCount == 0) "No onboarding pages" else "Page $currentPage of $pageCount"
+
 internal fun invokeCompletionOnce(
     wasInvoked: Boolean,
     onComplete: () -> Unit,
@@ -180,13 +190,9 @@ internal fun invokeCompletionOnce(
 private fun OnboardingProgress(
     pageCount: Int,
     selectedIndex: Int,
+    description: String,
     theme: OnboardingTheme,
 ) {
-    val description = if (pageCount == 0) {
-        "No onboarding pages"
-    } else {
-        "Page ${selectedIndex + 1} of $pageCount"
-    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -360,7 +366,7 @@ private fun OnboardingButton(
             .padding(horizontal = 16.dp, vertical = 15.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(title, color = Color.White, fontWeight = FontWeight.SemiBold)
+        Text(title, color = theme.buttonTextColor, fontWeight = FontWeight.SemiBold)
     }
 }
 

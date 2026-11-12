@@ -1,0 +1,4 @@
+jdk:
+  - openjdk17
+install:
+  - ./gradlew :onboarding-android:publishToMavenLocal -PGROUP=$GROUP -PVERSION_NAME=$VERSION

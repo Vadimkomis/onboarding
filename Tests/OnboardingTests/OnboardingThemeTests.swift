@@ -51,6 +51,48 @@ final class OnboardingThemeTests: XCTestCase {
         XCTAssertNotNil(theme.warningColor)
         XCTAssertNotNil(theme.borderColor)
         XCTAssertNotNil(theme.buttonGradient)
+        XCTAssertEqual(theme.buttonTextColor, .white)
+    }
+
+    func testThemeStoresCustomButtonTextColor() {
+        let theme = makeTheme(buttonTextColor: .black)
+
+        XCTAssertEqual(theme.buttonTextColor, .black)
+    }
+
+    func testThemeWithoutButtonTextColorKeepsWhiteLabel() {
+        let gradient = LinearGradient(colors: [.red, .blue], startPoint: .top, endPoint: .bottom)
+        let theme = OnboardingTheme(
+            background: gradient,
+            cardColor: .white,
+            raisedColor: .gray,
+            highlightColor: .yellow,
+            primaryTextColor: .black,
+            secondaryTextColor: .secondary,
+            accentColor: .green,
+            warningColor: .orange,
+            borderColor: .black,
+            buttonGradient: gradient
+        )
+
+        XCTAssertEqual(theme.buttonTextColor, .white)
+    }
+
+    private func makeTheme(buttonTextColor: Color) -> OnboardingTheme {
+        let gradient = LinearGradient(colors: [.red, .blue], startPoint: .top, endPoint: .bottom)
+        return OnboardingTheme(
+            background: gradient,
+            cardColor: .white,
+            raisedColor: .gray,
+            highlightColor: .yellow,
+            primaryTextColor: .black,
+            secondaryTextColor: .secondary,
+            accentColor: .green,
+            warningColor: .orange,
+            borderColor: .black,
+            buttonGradient: gradient,
+            buttonTextColor: buttonTextColor
+        )
     }
 
     func testStandardThemeMatchesCrossPlatformHighlightColor() {

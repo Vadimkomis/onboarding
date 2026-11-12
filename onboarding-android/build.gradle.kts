@@ -1,4 +1,5 @@
 import org.gradle.api.publish.maven.MavenPublication
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.library)
@@ -7,7 +8,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.vadimkomis"
+group = providers.gradleProperty("GROUP").getOrElse("com.vadimkomis")
 version = providers.gradleProperty("VERSION_NAME").getOrElse("1.1.0")
 
 android {
@@ -49,6 +50,15 @@ android {
         singleVariant("release") {
             withSourcesJar()
         }
+    }
+}
+
+// Keep the published library readable by apps that still build with Kotlin 2.1.
+kotlin {
+    coreLibrariesVersion = libs.versions.kotlin.consumer.get()
+    compilerOptions {
+        languageVersion.set(KotlinVersion.KOTLIN_2_1)
+        apiVersion.set(KotlinVersion.KOTLIN_2_1)
     }
 }
 

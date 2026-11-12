@@ -12,6 +12,7 @@ public struct OnboardingPage: Identifiable, Equatable, Sendable {
     public let subtitle: String
     public let media: OnboardingPageMedia
     public let accentLabel: String
+    public let mediaAccessibilityLabel: String?
 
     public var systemImage: String {
         guard case let .systemImage(systemImage) = media else {
@@ -26,13 +27,15 @@ public struct OnboardingPage: Identifiable, Equatable, Sendable {
         title: String,
         subtitle: String,
         media: OnboardingPageMedia,
-        accentLabel: String
+        accentLabel: String,
+        mediaAccessibilityLabel: String? = nil
     ) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.media = media
         self.accentLabel = accentLabel
+        self.mediaAccessibilityLabel = mediaAccessibilityLabel
     }
 
     public init(
@@ -40,14 +43,16 @@ public struct OnboardingPage: Identifiable, Equatable, Sendable {
         title: String,
         subtitle: String,
         systemImage: String,
-        accentLabel: String
+        accentLabel: String,
+        mediaAccessibilityLabel: String? = nil
     ) {
         self.init(
             id: id,
             title: title,
             subtitle: subtitle,
             media: .systemImage(systemImage),
-            accentLabel: accentLabel
+            accentLabel: accentLabel,
+            mediaAccessibilityLabel: mediaAccessibilityLabel
         )
     }
 }

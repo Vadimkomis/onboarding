@@ -9,6 +9,7 @@ public struct OnboardingFlow: View {
     private let completeTitle: String
     private let skipTitle: String
     private let allowsSkipping: Bool
+    private let progressAccessibilityLabel: (Int, Int) -> String
     private let onComplete: () -> Void
 
     @State private var state: OnboardingFlowState
@@ -20,6 +21,7 @@ public struct OnboardingFlow: View {
         completeTitle: String = "Get Started",
         skipTitle: String = "Skip",
         allowsSkipping: Bool = true,
+        progressAccessibilityLabel: @escaping (Int, Int) -> String = OnboardingFlow.defaultProgressAccessibilityLabel,
         onComplete: @escaping () -> Void
     ) {
         self.pages = pages
@@ -28,8 +30,19 @@ public struct OnboardingFlow: View {
         self.completeTitle = completeTitle
         self.skipTitle = skipTitle
         self.allowsSkipping = allowsSkipping
+        self.progressAccessibilityLabel = progressAccessibilityLabel
         self.onComplete = onComplete
         _state = State(initialValue: OnboardingFlowState(pageCount: pages.count))
+    }
+
+    /// English description of the current page, starting at 1, and the page count.
+    public static func defaultProgressAccessibilityLabel(_ currentPage: Int, _ pageCount: Int) -> String {
+        pageCount == 0 ? "No onboarding pages" : "Page \(currentPage) of \(pageCount)"
+    }
+
+    var currentProgressAccessibilityLabel: String {
+        let currentPage = pages.isEmpty ? 0 : state.selectedIndex + 1
+        return progressAccessibilityLabel(currentPage, pages.count)
     }
 
     public var body: some View {
@@ -89,7 +102,8 @@ public struct OnboardingFlow: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)
-        .accessibilityHidden(true)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(currentProgressAccessibilityLabel)
     }
 
     private var controls: some View {
@@ -148,6 +162,7 @@ private struct OnboardingPageView: View {
                         isActive: isActive,
                         mediaSize: mediaSize
                     )
+                    .onboardingMediaAccessibility(label: page.mediaAccessibilityLabel)
 
                     Text(page.accentLabel.uppercased())
                         .font(.caption.weight(.bold))
@@ -219,6 +234,18 @@ private struct OnboardingMediaView: View {
                 .frame(width: visualSize.width, height: visualSize.height)
                 .clipped()
                 .frame(width: mediaSize.width, height: mediaSize.height, alignment: .bottom)
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func onboardingMediaAccessibility(label: String?) -> some View {
+        if let label, !label.isEmpty {
+            accessibilityElement(children: .ignore)
+                .accessibilityLabel(label)
+        } else {
+            accessibilityHidden(true)
         }
     }
 }
@@ -453,7 +480,7 @@ private struct OnboardingPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline.weight(.semibold))
-            .foregroundColor(.white)
+            .foregroundColor(theme.buttonTextColor)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .background(theme.buttonGradient)

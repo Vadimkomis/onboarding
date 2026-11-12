@@ -7,6 +7,20 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Added
+
+- `buttonTextColor` theme color for the primary button label on iOS and Android, defaulting to white.
+- App-supplied progress descriptions for assistive technology on iOS (`progressAccessibilityLabel`) and Android (`progressDescription`), so apps can localize "Page 1 of 3".
+- Optional `mediaAccessibilityLabel` on iOS pages, matching Android's media `contentDescription`.
+- JitPack publication for the Android library as `com.github.Vadimkomis:onboarding`.
+
+### Changed
+
+- The Android library now supports apps built with Kotlin 2.1 and Jetpack Compose 1.8. It no longer raises a consuming app's Kotlin standard library, Compose, or lifecycle versions.
+- VoiceOver now announces the iOS progress indicator, matching TalkBack on Android.
+- iOS page media without a `mediaAccessibilityLabel` is hidden from VoiceOver instead of announcing its symbol or asset name.
+- Android apps compiled against 1.1.0 must be recompiled, because `OnboardingFlow` and `OnboardingTheme` gained optional parameters.
+
 ## [1.1.0] - 2026-07-22
 
 ### Added

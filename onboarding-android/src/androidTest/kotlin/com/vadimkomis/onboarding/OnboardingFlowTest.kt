@@ -1,16 +1,21 @@
 package com.vadimkomis.onboarding
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.text.TextLayoutResult
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -86,6 +91,63 @@ class OnboardingFlowTest {
             composeRule.onAllNodesWithText("Get Started").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNode(hasContentDescription("Page 2 of 2")).assertExists()
+    }
+
+    @Test
+    fun progressAnnouncesAppSuppliedDescription() {
+        composeRule.setContent {
+            OnboardingFlow(
+                pages = testPages(),
+                progressDescription = { page, pageCount -> "Seite $page von $pageCount" },
+                onComplete = {},
+            )
+        }
+
+        composeRule.onNodeWithTag(OnboardingTestTags.progress)
+            .assertContentDescriptionEquals("Seite 1 von 2")
+    }
+
+    @Test
+    fun emptyFlowAsksTheAppToDescribeZeroPages() {
+        composeRule.setContent {
+            OnboardingFlow(
+                pages = emptyList(),
+                progressDescription = { page, pageCount -> "$page/$pageCount" },
+                onComplete = {},
+            )
+        }
+
+        composeRule.onNodeWithTag(OnboardingTestTags.progress)
+            .assertContentDescriptionEquals("0/0")
+    }
+
+    @Test
+    fun primaryButtonLabelUsesThemeButtonTextColor() {
+        composeRule.setContent {
+            OnboardingFlow(
+                pages = testPages(),
+                theme = OnboardingTheme.standard.copy(buttonTextColor = Color.Black),
+                onComplete = {},
+            )
+        }
+
+        assertEquals(Color.Black, textColor("Continue"))
+    }
+
+    @Test
+    fun primaryButtonLabelIsWhiteInStandardTheme() {
+        composeRule.setContent {
+            OnboardingFlow(pages = testPages(), onComplete = {})
+        }
+
+        assertEquals(Color.White, textColor("Continue"))
+    }
+
+    private fun textColor(text: String): Color {
+        val results = mutableListOf<TextLayoutResult>()
+        composeRule.onNodeWithText(text, useUnmergedTree = true)
+            .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(results) }
+        return results.single().layoutInput.style.color
     }
 
     @Test

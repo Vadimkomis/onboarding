@@ -70,6 +70,29 @@ Feature: Onboarding page composition
     And the title and subtitle wrap without being clipped
     And the status is "completed"
 
+Feature: Onboarding theming and accessibility
+
+  Scenario: Theme the primary button label
+    Given an app supplies a button text color in its onboarding theme
+    When the primary action is displayed
+    Then its label uses that color on iOS and Android
+    And the standard theme and themes that omit the color keep a white label
+    And the status is "completed"
+
+  Scenario: Announce onboarding progress in the app's language
+    Given an app supplies a progress description for the current page and page count
+    When assistive technology focuses the progress indicator on iOS or Android
+    Then it announces the app-supplied description
+    And flows that omit the description announce "Page 1 of 3" style English text
+    And the status is "completed"
+
+  Scenario: Describe page media to assistive technology
+    Given an onboarding page supplies a media description
+    When assistive technology focuses the page media on iOS or Android
+    Then it announces that description
+    And media without a description is hidden from assistive technology
+    And the status is "completed"
+
 Feature: Android onboarding support
 
   Scenario: Build Android support from the intended development hosts
@@ -111,3 +134,16 @@ Feature: Android onboarding support
     When host-side screenshot validation runs on macOS or Linux
     Then the initial multi-page flow, single-page completion state, and completed gate content match their references
     And the status is "completed"
+
+  Scenario: Consume the Android library from an older app toolchain
+    Given an app builds with Kotlin 2.1 and Jetpack Compose 1.8
+    When it adds the onboarding-android library
+    Then the app compiles without upgrading its Kotlin compiler or standard library
+    And the library does not raise the app's Compose or lifecycle versions
+    And the status is "completed"
+
+  Scenario: Install the Android library from JitPack
+    Given a release tag has been pushed to the public repository
+    When an app adds the JitPack repository and the com.github.Vadimkomis:onboarding coordinate
+    Then Gradle resolves the Android library without a local Maven publication
+    And the status is "in-progress"

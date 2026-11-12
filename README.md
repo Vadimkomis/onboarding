@@ -26,6 +26,7 @@ This demo shows the iOS SwiftUI implementation.
 - [Page Media](#page-media)
 - [Custom Theme](#custom-theme)
 - [Optional Skip](#optional-skip)
+- [Accessibility](#accessibility)
 - [API Summary](#api-summary)
 - [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
@@ -33,7 +34,7 @@ This demo shows the iOS SwiftUI implementation.
 ## Requirements
 
 - iOS: iOS 17+, Swift 5.9+, and Swift Package Manager
-- Android: API 23+ and Jetpack Compose
+- Android: API 23+, Kotlin 2.1+, and Jetpack Compose 1.8+
 - Android development: macOS or Linux, JDK 17, and Android SDK 36
 
 ## iOS Installation
@@ -169,7 +170,8 @@ let theme = OnboardingTheme(
         colors: [.blue, .purple],
         startPoint: .leading,
         endPoint: .trailing
-    )
+    ),
+    buttonTextColor: .white
 )
 
 OnboardingGate(
@@ -184,6 +186,8 @@ OnboardingGate(
 
 If you do not pass a theme, the package uses `OnboardingTheme.standard`.
 
+`buttonTextColor` colors the primary button label. It is optional and defaults to white, so set it when your button background is light.
+
 ## Optional Skip
 
 The skip button is enabled by default. Disable it when users must complete every onboarding page:
@@ -195,6 +199,34 @@ OnboardingGate(
     allowsSkipping: false
 ) {
     MainAppView()
+}
+```
+
+## Accessibility
+
+Give page media a description when it carries meaning. Media without a description is hidden from VoiceOver:
+
+```swift
+OnboardingPage(
+    id: "progress",
+    title: "See every PR grow",
+    subtitle: "Follow personal records over time.",
+    media: .image(name: "onboarding-progress"),
+    accentLabel: "Progress",
+    mediaAccessibilityLabel: "Personal record progress chart"
+)
+```
+
+VoiceOver announces the progress indicator as "Page 1 of 3". Pass `progressAccessibilityLabel` to `OnboardingFlow` to localize or reword it. The closure receives the current page, starting at 1, and the page count; an empty flow passes 0 for both:
+
+```swift
+OnboardingFlow(
+    pages: onboardingPages,
+    progressAccessibilityLabel: { page, pageCount in
+        String(localized: "Page \(page) of \(pageCount)")
+    }
+) {
+    markOnboardingComplete()
 }
 ```
 
@@ -241,7 +273,8 @@ OnboardingPage(
     title: String,
     subtitle: String,
     media: OnboardingPageMedia,
-    accentLabel: String
+    accentLabel: String,
+    mediaAccessibilityLabel: String? = nil
 )
 
 OnboardingFlow(
@@ -251,6 +284,7 @@ OnboardingFlow(
     completeTitle: String = "Get Started",
     skipTitle: String = "Skip",
     allowsSkipping: Bool = true,
+    progressAccessibilityLabel: @escaping (Int, Int) -> String = OnboardingFlow.defaultProgressAccessibilityLabel,
     onComplete: @escaping () -> Void
 )
 ```
@@ -261,32 +295,16 @@ The `onboarding-android` module provides the same core onboarding flow as a nati
 
 ### Android installation
 
-Android artifacts are not published to Maven Central or another remote package repository. Clone this repository and publish the release artifact to your local Maven repository:
+From version 1.2.0, the Android library is published through [JitPack](https://jitpack.io/#Vadimkomis/onboarding). It supports apps built with Kotlin 2.1 or newer and Jetpack Compose 1.8 or newer, and does not raise the app's Compose version.
 
-```sh
-git clone --branch 1.1.0 --depth 1 https://github.com/Vadimkomis/onboarding.git
-cd onboarding
-./gradlew :onboarding-android:publishToMavenLocal
-```
-
-The repository's Gradle build includes the library as `:onboarding-android`. Its default local Maven coordinates are `com.vadimkomis:onboarding:1.1.0`.
-
-A module developed inside this source checkout can depend on the Gradle project directly:
-
-```kotlin
-dependencies {
-    implementation(project(":onboarding-android"))
-}
-```
-
-Add `mavenLocal()` to the consuming app's dependency repositories:
+Add the JitPack repository to the consuming app:
 
 ```kotlin
 dependencyResolutionManagement {
     repositories {
-        mavenLocal()
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 ```
@@ -295,14 +313,28 @@ Then add the dependency to the app module:
 
 ```kotlin
 dependencies {
-    implementation("com.vadimkomis:onboarding:1.1.0")
+    implementation("com.github.Vadimkomis:onboarding:1.2.0")
 }
 ```
 
-To publish under a different local version, pass the same version to publication and dependency resolution:
+#### Local builds
+
+To use an unreleased checkout, publish it to your local Maven repository:
 
 ```sh
-./gradlew -PVERSION_NAME=1.1.0-local :onboarding-android:publishToMavenLocal
+git clone https://github.com/Vadimkomis/onboarding.git
+cd onboarding
+./gradlew -PVERSION_NAME=1.2.0-local :onboarding-android:publishToMavenLocal
+```
+
+Add `mavenLocal()` to the consuming app's repositories and depend on `com.vadimkomis:onboarding:1.2.0-local`. Pass the same version to publication and dependency resolution.
+
+A module developed inside this source checkout can depend on the Gradle project directly:
+
+```kotlin
+dependencies {
+    implementation(project(":onboarding-android"))
+}
 ```
 
 ### Android quick start
@@ -381,11 +413,14 @@ OnboardingFlow(
     completeTitle = "Get Started",
     skipTitle = "Skip",
     allowsSkipping = true,
+    progressDescription = { page, pageCount -> "Page $page of $pageCount" },
     onComplete = ::markOnboardingComplete,
 )
 ```
 
-Set `allowsSkipping = false` on either `OnboardingGate` or `OnboardingFlow` to require every page. Pass `OnboardingTheme.standard` explicitly or provide a custom `OnboardingTheme` to change the Compose colors and brushes.
+`progressDescription` supplies the text TalkBack announces for the progress indicator, so apps can localize it. It receives the current page, starting at 1, and the page count; an empty flow passes 0 for both. It defaults to "Page 1 of 3" style English text.
+
+Set `allowsSkipping = false` on either `OnboardingGate` or `OnboardingFlow` to require every page. Pass `OnboardingTheme.standard` explicitly or provide a custom `OnboardingTheme` to change the Compose colors and brushes. `buttonTextColor` colors the primary button label and defaults to white.
 
 Android media constructors are:
 
@@ -394,6 +429,8 @@ OnboardingPageMedia.Icon(imageVector = appIcon, contentDescription = "App icon")
 OnboardingPageMedia.Drawable(resourceId = R.drawable.onboarding_image, contentDescription = "Preview")
 OnboardingPageMedia.Video(uri = videoUri, contentDescription = "Demo video")
 ```
+
+Media without a `contentDescription` is hidden from TalkBack.
 
 Video pages use Media3. Playback is muted and loops while the page is active, pauses when inactive, and releases the player with the lifecycle. First-frame poster extraction runs off the UI thread and falls back to an empty media viewport when no frame can be loaded.
 
