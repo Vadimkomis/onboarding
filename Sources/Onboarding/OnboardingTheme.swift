@@ -11,6 +11,7 @@ public struct OnboardingTheme {
     public let warningColor: Color
     public let borderColor: Color
     public let buttonGradient: LinearGradient
+    public let buttonTextColor: Color
 
     public init(
         background: LinearGradient,
@@ -22,7 +23,8 @@ public struct OnboardingTheme {
         accentColor: Color,
         warningColor: Color,
         borderColor: Color,
-        buttonGradient: LinearGradient
+        buttonGradient: LinearGradient,
+        buttonTextColor: Color = .white
     ) {
         self.background = background
         self.cardColor = cardColor
@@ -34,6 +36,7 @@ public struct OnboardingTheme {
         self.warningColor = warningColor
         self.borderColor = borderColor
         self.buttonGradient = buttonGradient
+        self.buttonTextColor = buttonTextColor
     }
 
     public static let standard = OnboardingTheme(

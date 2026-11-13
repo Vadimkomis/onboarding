@@ -22,8 +22,10 @@ class OnboardingThemeTest {
             warningColor = Color.Yellow,
             borderColor = Color.White.copy(alpha = 0.1f),
             buttonGradient = buttonGradient,
+            buttonTextColor = Color.Black,
         )
 
+        assertEquals(Color.Black, theme.buttonTextColor)
         assertEquals(background, theme.background)
         assertEquals(Color.DarkGray, theme.cardColor)
         assertEquals(Color.Gray, theme.raisedColor)
@@ -50,5 +52,25 @@ class OnboardingThemeTest {
         assertEquals(Color(0xFFF59E0B), theme.warningColor)
         assertEquals(Color.White.copy(alpha = 0.16f), theme.borderColor)
         assertNotNull(theme.buttonGradient)
+        assertEquals(Color.White, theme.buttonTextColor)
+    }
+
+    @Test
+    fun themeWithoutButtonTextColorKeepsWhiteLabel() {
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.Blue))
+        val theme = OnboardingTheme(
+            background = brush,
+            cardColor = Color.DarkGray,
+            raisedColor = Color.Gray,
+            highlightColor = Color.Blue,
+            primaryTextColor = Color.White,
+            secondaryTextColor = Color.LightGray,
+            accentColor = Color.Cyan,
+            warningColor = Color.Yellow,
+            borderColor = Color.White,
+            buttonGradient = brush,
+        )
+
+        assertEquals(Color.White, theme.buttonTextColor)
     }
 }

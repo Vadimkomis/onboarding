@@ -52,6 +52,52 @@ final class OnboardingFlowTests: XCTestCase {
         _ = flow.body
     }
 
+    func testDefaultProgressAccessibilityLabelNamesPageAndPageCount() {
+        XCTAssertEqual(OnboardingFlow.defaultProgressAccessibilityLabel(2, 3), "Page 2 of 3")
+    }
+
+    func testDefaultProgressAccessibilityLabelExplainsAnEmptyFlow() {
+        XCTAssertEqual(OnboardingFlow.defaultProgressAccessibilityLabel(0, 0), "No onboarding pages")
+    }
+
+    func testProgressAccessibilityLabelUsesDefaultForFirstPage() {
+        let flow = OnboardingFlow(pages: makePages(count: 3), onComplete: {})
+
+        XCTAssertEqual(flow.currentProgressAccessibilityLabel, "Page 1 of 3")
+    }
+
+    func testProgressAccessibilityLabelUsesAppSuppliedDescription() {
+        let flow = OnboardingFlow(
+            pages: makePages(count: 3),
+            progressAccessibilityLabel: { page, pageCount in "Seite \(page) von \(pageCount)" },
+            onComplete: {}
+        )
+
+        XCTAssertEqual(flow.currentProgressAccessibilityLabel, "Seite 1 von 3")
+    }
+
+    func testProgressAccessibilityLabelAsksTheAppToDescribeAnEmptyFlow() {
+        let flow = OnboardingFlow(
+            pages: [],
+            progressAccessibilityLabel: { page, pageCount in "\(page)/\(pageCount)" },
+            onComplete: {}
+        )
+
+        XCTAssertEqual(flow.currentProgressAccessibilityLabel, "0/0")
+    }
+
+    private func makePages(count: Int) -> [OnboardingPage] {
+        (0..<count).map { index in
+            OnboardingPage(
+                id: "page-\(index)",
+                title: "Title",
+                subtitle: "Subtitle",
+                systemImage: "sparkles",
+                accentLabel: "Accent"
+            )
+        }
+    }
+
     private func makeTheme() -> OnboardingTheme {
         OnboardingTheme(
             background: LinearGradient(

@@ -16,6 +16,7 @@ public data class OnboardingTheme(
     public val warningColor: Color,
     public val borderColor: Color,
     public val buttonGradient: Brush,
+    public val buttonTextColor: Color = Color.White,
 ) {
     public companion object {
         public val standard: OnboardingTheme = OnboardingTheme(

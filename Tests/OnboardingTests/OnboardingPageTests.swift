@@ -47,6 +47,59 @@ final class OnboardingPageTests: XCTestCase {
         XCTAssertEqual(page.systemImage, "")
     }
 
+    func testOnboardingPageStoresMediaAccessibilityLabel() {
+        let page = OnboardingPage(
+            id: "progress",
+            title: "Progress",
+            subtitle: "Follow your records.",
+            media: .image(name: "onboarding-progress"),
+            accentLabel: "Progress",
+            mediaAccessibilityLabel: "Personal record progress chart"
+        )
+
+        XCTAssertEqual(page.mediaAccessibilityLabel, "Personal record progress chart")
+    }
+
+    func testOnboardingPageStoresMediaAccessibilityLabelForSystemImage() {
+        let page = OnboardingPage(
+            id: "train",
+            title: "Train",
+            subtitle: "Log each set.",
+            systemImage: "dumbbell",
+            accentLabel: "Train",
+            mediaAccessibilityLabel: "Strength workout"
+        )
+
+        XCTAssertEqual(page.mediaAccessibilityLabel, "Strength workout")
+    }
+
+    func testOnboardingPageMediaAccessibilityLabelDefaultsToNil() {
+        let page = OnboardingPage(
+            id: "welcome",
+            title: "Welcome",
+            subtitle: "Learn the basics.",
+            systemImage: "sparkles",
+            accentLabel: "New"
+        )
+
+        XCTAssertNil(page.mediaAccessibilityLabel)
+    }
+
+    func testOnboardingPageEquatableComparesMediaAccessibilityLabel() {
+        func page(label: String?) -> OnboardingPage {
+            OnboardingPage(
+                id: "welcome",
+                title: "Welcome",
+                subtitle: "Learn the basics.",
+                systemImage: "sparkles",
+                accentLabel: "New",
+                mediaAccessibilityLabel: label
+            )
+        }
+
+        XCTAssertNotEqual(page(label: "Sparkles"), page(label: nil))
+    }
+
     func testOnboardingPageUsesIdForIdentifiableConformance() {
         let page = OnboardingPage(
             id: "permissions",

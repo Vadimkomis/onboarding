@@ -2,6 +2,7 @@
 
 import PackageDescription
 
+// Tests live in Tests/Package.swift so apps that add this package fetch no test-only dependencies.
 let package = Package(
     name: "Onboarding",
     platforms: [
@@ -13,21 +14,7 @@ let package = Package(
             targets: ["Onboarding"]
         )
     ],
-    dependencies: [
-        .package(
-            url: "https://github.com/pointfreeco/swift-snapshot-testing",
-            from: "1.19.2"
-        )
-    ],
     targets: [
-        .target(name: "Onboarding"),
-        .testTarget(
-            name: "OnboardingTests",
-            dependencies: [
-                "Onboarding",
-                .product(name: "SnapshotTesting", package: "swift-snapshot-testing")
-            ],
-            exclude: ["__Snapshots__"]
-        )
+        .target(name: "Onboarding")
     ]
 )
