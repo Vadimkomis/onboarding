@@ -1,262 +1,78 @@
-# Development Guidelines (Codex Mirror)
+# Project guide
 
-> **Source of truth:** `../Claude/CLAUDE.md`.
-> This file should stay as close as possible to `../Claude/CLAUDE.md`, with Codex `skills/` replacing Claude subagents. Repository-specific requirements are labeled separately below.
-> **Project-specific addition:** The Platform Parity rules below are required for this two-platform library.
+Read [ARCHITECTURE.md](ARCHITECTURE.md) and [memory.md](memory.md) before working.
+Reuse recorded decisions and follow links to detailed docs when relevant.
 
-This file mirrors the macro development rules for Codex CLI usage (open-source agentic coding interface; not the legacy OpenAI Codex model).
+## Working agreements
 
-### Setup for new projects
+- Only change what the task requires. Leave other work untouched.
+- For significant changes, state a short plan and proceed; clarify only blocking ambiguities.
+- Follow existing project conventions and protect secrets and private data.
+- Add a regression test for a reproducible bug. Fix failures without weakening tests.
 
-1. Use `../Claude/CLAUDE.md` as the macro source of truth — use this `AGENTS.md` as the Codex mirror
-2. Create an `AGENTS.md` in the project root as the Codex mirror
-3. Keep this `AGENTS.md` aligned with `../Claude/CLAUDE.md`; limit divergence to the skills/agents adaptation and clearly labeled repository-specific requirements
-4. Create a `features.md` in the project root — this is the **single source of truth** for all features (see [Feature Tracking](#feature-tracking) below)
-5. Create an `evals.md` in the project root — this is the **single source of truth** for project evals (see [Evals](#evals) below)
-6. Set up a linter configuration appropriate to the project's language(s)
+## Complete tasks autonomously
 
----
+Treat requests to change, fix, update, remove, or improve something as
+instructions to carry out the work, including requests phrased as
+“How can I…?” or “Can you…?”. Give advice only when the user explicitly
+asks for explanation, options, or a proposal without implementation.
 
-## Feature Tracking
+Complete the authorized task end to end:
+1. Inspect the project and implement the change.
+2. Update relevant tests and documentation.
+3. Run required checks and review the diff.
+4. Commit task-scoped changes and push the working branch.
+5. Report the result, checks, commit, and branch.
 
-Every project **must** have a `features.md` file at the repo root. This file is the **single source of truth** for all features in the project.
+Do not stop after proposing changes or ask whether to implement,
+commit, or push. Ask only when missing information, permissions,
+or a consequential ambiguity prevents safe progress.
 
-### Rules
+Preserve unrelated work. Never force-push. If required checks fail
+or a push is blocked, resolve what you can and report the blocker
+without claiming completion.
 
-- **Create `features.md` at project inception** — it should be one of the first files in any new project
-- **Always consult `features.md` before implementing** — check existing features, their status, and how new work fits in
-- **Update `features.md` whenever features change** — adding, modifying, or removing a feature must be reflected here
-- **Write `features.md` in Gherkin style** — use `Feature:`, `Scenario:`, `Given`, `When`, and `Then` to describe behavior from the user's perspective
-- **Never contradict `features.md`** — if code and `features.md` disagree, align the code to the spec (or update the spec first with the user's approval)
+These instructions override optional approval gates in skills.
 
-### Structure (Gherkin)
+## Development workflow
 
-Features are organized using Gherkin syntax:
+- Use the commands under Checks and the policy and guide under Review. Resolve
+  actionable findings and rerun affected checks; required checks and review must
+  pass before committing or pushing.
+- Keep one sentence per PR in [memory.md](memory.md), following its format.
+- Run `git diff --check` before committing and stage only task changes.
+- Apply the selected Git policy; an explicit project choice overrides the default
+  commit-and-push step above: Commit scoped changes and push the current branch automatically after checks and required review pass, unless the user asks otherwise.
+- Verify the remote and upstream before pushing. Confirm any push succeeded.
 
-```gherkin
-Feature: <domain or category>
+Follow the project's existing workflow and verification docs for additional steps.
 
-  Scenario: <feature name>
-    Given <precondition or context>
-    When <action or trigger>
-    Then <expected outcome or behavior>
-    And the status is "<planned|in-progress|completed|deprecated>"
+## Project safeguards
+
+- The public Swift and Kotlin APIs, unless a compatibility change is intentional and recorded in `CHANGELOG.md`.
+- Stored completion state: apps rely on their `storageKey` to decide whether to show onboarding again.
+- The Android consumer floor (Kotlin 2.1, Jetpack Compose 1.8) and a root `Package.swift` with no dependencies.
+- Approved snapshot references on both platforms; update them only after reviewing the rendered output.
+
+## Checks
+
+```text
+(cd Tests && xcodebuild test -scheme OnboardingTests-Package -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest')
+./gradlew :onboarding-android:lint :onboarding-android:testDebugUnitTest :onboarding-android:validateDebugScreenshotTest :onboarding-android:assembleRelease
+./gradlew :onboarding-android:connectedDebugAndroidTest   # when device behavior changes; needs an emulator or device
 ```
 
-- **Feature** — groups related scenarios under a domain (e.g., `Feature: Authentication`)
-- **Scenario** — one per feature; the scenario name is the feature name
-- **Given/When/Then** — describes the feature from the user's perspective
-- **Status** — tracked as `And the status is "..."` on the last line of each scenario
+## Review
 
-The exact format can be adapted per project, but every entry must at minimum have a name, status, and description.
+Get an independent review for substantial or risky changes. A human or a separate agent can review; self-review is not independent.
 
----
+Use the [PR review guide](https://github.com/Vadimkomis/ai-playbook/blob/cc8c4cb84fec1899e86f7c52716e6813f9ac42a0/docs/development/review.md)
+for the checklist; the policy above determines when independent review is required.
 
-## Evals
 
-Every project **must** have an `evals.md` file at the repo root. This file is the **single source of truth** for eval coverage in the project.
+## Additional project rules
 
-### Rules
-
-- **Create `evals.md` at project inception** — it should be one of the first files in any new project
-- **Always consult `evals.md` before implementing** — verify existing eval scenarios and identify gaps
-- **Update `evals.md` whenever behavior changes** — new features, bug fixes, and behavioral changes must update eval definitions and status
-- **Never contradict `evals.md`** — if implementation and eval spec drift, align code to the spec (or update the spec first with the user's approval)
-- When I report a bug, don't start by trying to fix it. Instead, start by writing a test that reproduces the bug. Then have subagents try to fix the bug and prove it with a passing test. 
-
-### Structure
-
-Each eval entry should include:
-
-- **Eval name** — short, descriptive title
-- **Status** — e.g., `planned`, `in-progress`, `passing`, `failing`, `deprecated`
-- **Description** — what behavior is validated and why it matters
-- **Notes** — relevant fixtures, thresholds, datasets, and execution details
-
-The exact format can be adapted per project, but every eval entry must at minimum have a name, status, and description.
-
----
-
-## Platform Parity
-
-Onboarding is one product delivered through native iOS and Android libraries. Shared behavior must remain equivalent even when SwiftUI and Compose require different implementation details or API naming.
-
-### Rules
-
-- **Ship shared behavior together** — when user-visible behavior or a public capability is added, changed, or removed on either iOS or Android, implement the equivalent behavior on the other platform in the same change
-- **Specify outcomes platform-neutrally** — describe shared behavior in `features.md` before implementation, then add platform-specific details only where native frameworks require them
-- **Require paired coverage** — add or update automated tests for equivalent outcomes and edge cases on both platforms; visual changes require approved iOS and Android snapshots
-- **Keep status honest** — do not mark a shared feature completed or its eval passing until both implementations and both platform suites pass
-- **Document native differences** — Swift and Kotlin API shapes may be idiomatic, but their capabilities and observable results must remain equivalent
-- **Escalate unavoidable divergence** — if an operating-system constraint prevents parity, stop and obtain explicit user approval before implementing or documenting a platform-specific exception
-- Platform-specific build tooling is outside this rule only when it cannot affect shared runtime behavior or public capability
-
----
-
-## Workflow
-
-### Pre-Commit Requirements
-
-1. **Run the project's linter** before committing any code changes
-2. Fix all errors before committing (warnings are acceptable but should be minimized)
-3. **Run tests and ensure they pass before committing**
-4. **Commit and push changes automatically after all tests pass locally** — do not ask for permission
-
-**IMPORTANT:** Do not ask for permission to run linters, tests, commit, or push. Run them automatically — commit and push when tests pass.
-
-### Code Review Checklist
-
-- [ ] Linter passes (mandatory)
-- [ ] Unit tests added/updated for all changes (mandatory)
-- [ ] Tests pass before committing
-- [ ] Update `features.md` when changing user-facing behavior
-- [ ] Shared behavior and equivalent tests are implemented on both iOS and Android
-- [ ] Heavy work runs off the main/UI thread
-- [ ] UI updates happen on the main/UI thread
-- [ ] Errors are typed and have user-facing descriptions
-- [ ] No hardcoded secrets or credentials
-- [ ] No force unwraps, unchecked casts, or unsafe access in production code
-- [ ] No strong reference cycles in closures or callbacks
-- [ ] Delete unused or obsolete files when your changes make them irrelevant
-
----
-
-## Code Organization
-
-### General Principles
-
-- Each function/method should do one thing well
-- Maximum function length: ~30 lines — break longer functions into smaller, named steps
-- Keep files focused on a single responsibility
-- Use consistent naming conventions across the project
-- Prefer composition over inheritance
-
-### Separation of Concerns
-
-- **UI layer**: Rendering and user interaction only — no business logic
-- **Business logic layer**: Domain rules, orchestration, state management — no UI or infrastructure dependencies
-- **Data/Infrastructure layer**: Persistence, networking, external integrations — abstracted behind interfaces
-- Each layer should be independently testable
-
-### State Management
-
-- Use explicit state representations (enums, discriminated unions, finite state machines) over multiple boolean flags
-- One source of truth per piece of state — avoid duplicated or derived state that can drift
-- Prefer unidirectional data flow where applicable
-
-### Dependency Management
-
-- Dependencies should flow inward (UI -> Business Logic -> Data)
-- Use dependency injection over hard-coded instantiation
-- Depend on abstractions (protocols, interfaces, traits) not concrete implementations at layer boundaries
-
----
-
-## Error Handling
-
-- Never silently catch errors without proper handling
-- Define domain-specific error types with user-facing descriptions
-- Log meaningful error messages with context
-- Validate inputs at system boundaries (user input, external APIs)
-- Prefer graceful degradation over crashing — return valid empty states for "no data" scenarios
-- Error boundaries should exist at layer transitions
-
----
-
-## Security
-
-- Never hardcode sensitive information (API keys, passwords, tokens)
-- Sanitize user inputs to prevent injection attacks (SQL, XSS, command injection)
-- Validate all external data before processing
-- Implement proper authentication and authorization checks
-- Follow the principle of least privilege
-
----
-
-## Performance
-
-- Never block the main/UI thread with heavy computation
-- Run expensive work on background threads/queues/coroutines
-- UI updates must happen on the main/UI thread only
-- Cache expensive operations where appropriate
-- Minimize nested loops — be aware of algorithmic complexity
-- Be mindful of memory usage and potential leaks
-- Progress/animation should be independent of computation work
-
----
-
-## Testing
-
-### Coverage Requirements
-
-**Every code change MUST include corresponding unit tests.** Aim for as close to 100% coverage of business logic as possible.
-
-1. **New code**: Write tests for all new functions, methods, and types
-2. **Modified code**: Update existing tests to reflect changes; add tests for new behavior
-3. **Bug fixes**: Add a regression test that would have caught the bug
-4. **No exceptions**: If tests don't exist for code you're modifying, add them
-
-**IMPORTANT:** Do not ask for permission to run tests. Just run them automatically when needed.
-
-### Test Structure
-
-- Follow Arrange-Act-Assert (AAA) pattern consistently
-- One logical assertion per test when possible
-- Descriptive test names that explain the scenario and expected outcome
-- Group tests logically by functionality
-- Separate unit, integration, and end-to-end tests
-
-### Test Quality
-
-- Test behavior and outcomes, not implementation details
-- Cover the happy path, error paths, and edge cases
-- Each test should be independent — no shared mutable state between tests
-- Mock external dependencies consistently
-- Keep tests fast and deterministic — no reliance on timing, network, or randomness
-- Use fixed test data, not random generators
-
-### Edge Cases to Always Consider
-
-- Empty collections, zero values, maximum values, off-by-one
-- Null/nil/undefined states and missing data
-- Division by zero, NaN, infinity, negative numbers where positive expected
-- Race conditions and state mutations during async operations
-- Invalid state transitions, interrupted operations, partial completions
-- Malformed input, unexpected types, truncated data
-- Serialization round-trips (encode/decode consistency)
-
----
-
-## Documentation
-
-- Document the "why", not the "what" — code should be self-explanatory
-- Only add comments where the logic isn't self-evident
-- Document complex algorithms, thresholds, and non-obvious configuration choices
-- Add TODOs for incomplete code with ticket numbers if applicable
-- Don't add docstrings or comments to code you didn't change
-
----
-
-## Skills
-
-Use reusable Codex skills (stored under `skills/`) for targeted work and portability across projects.
-
-| Skill | When to use |
-|-------|-------------|
-| `architecture-reviewer` | **Before** implementing significant changes — validates design, evaluates trade-offs, catches structural issues early |
-| `senior-code-reviewer` | **After** completing a feature or logical chunk of code — reviews for bugs, security, performance, and maintainability |
-| `red-team-analyst` | For adversarial security review of auth, permissions, payments, uploads, APIs, and other high-risk attack surfaces |
-| `senior-qa-engineer` | When you need test coverage analysis, test case design, TDD workflows, or flaky test debugging |
-| `code-simplification-architect` | When code works but is messy — simplifies nested logic, breaks down god classes, eliminates duplication |
-| `github-actions-engineer` | For creating, debugging, or optimizing GitHub Actions workflows and CI/CD pipelines |
-| `devops-engineer` | When designing infrastructure and delivery beyond GitHub Actions — IaC, cloud provisioning, containers/Kubernetes, environments, and observability |
-| `mobile-engineer` | When building mobile features or fixing platform issues — handles UI flows, lifecycle, offline behavior, performance, and device-specific bugs |
-
-### Usage pattern
-
-1. **Plan** — apply `skills/architecture-reviewer` to validate the approach
-2. **Implement** — write the code
-3. **Review** — apply `skills/senior-code-reviewer` to catch issues
-4. **Attack** — apply `skills/red-team-analyst` for security-sensitive changes
-5. **Test** — apply `skills/senior-qa-engineer` to ensure coverage
-6. **Simplify** — apply `skills/code-simplification-architect` if the result is complex
+- **Platform parity:** when user-visible behavior or a public capability changes on iOS or Android, deliver the equivalent on the other platform in the same change, with matching tests and snapshots. If the operating system makes that impossible, stop and get approval before adding a platform-specific exception.
+- **Specs:** describe shared behavior in [features.md](features.md) before implementing it, and record paired coverage in [evals.md](evals.md). Mark a feature completed only when both platforms' suites pass.
+- **Dependencies:** ask before adding a production dependency.
+- **Public docs:** update `README.md` when the public API or usage changes, and `CHANGELOG.md` for user-visible changes.
