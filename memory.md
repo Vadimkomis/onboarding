@@ -13,3 +13,7 @@ Do not repeat information already documented elsewhere.
 ## [PR #2](https://github.com/Vadimkomis/onboarding/pull/2) — Older Android apps, accessibility text and ai-playbook 1.4.0
 
 Made the Android library usable by apps on Kotlin 2.1 and Compose 1.8, added app-supplied button text color and accessibility text on both platforms, set up JitPack publishing, moved the iOS tests into their own package, and replaced the old agent guidance with ai-playbook 1.4.0.
+
+## main — Release 1.2.0
+
+Set the Android library version and changelog heading for the 1.2.0 release.
